@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>لوحة التحكم — جامعة تكريت</title>
+<link rel="stylesheet" href="style.css">
+<style>
+html,body{height:100%;overflow:hidden}
+.wrap{display:flex;height:100vh;overflow:hidden;font-family:'Cairo','Poppins',sans-serif}
+
+/* ── Sidebar ── */
+.sb{width:250px;flex-shrink:0;background:linear-gradient(180deg,#0a1a0f 0%,#163020 100%);
+  display:flex;flex-direction:column;height:100vh;overflow-y:auto;
+  border-left:1px solid rgba(197,170,16,.12);position:relative;z-index:100;
+  transition:transform .3s}
+.sb-logo{padding:1.5rem 1.3rem 1.2rem;border-bottom:1px solid rgba(197,170,16,.15);
+  display:flex;align-items:center;gap:.75rem}
+.sb-logo img{width:36px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.4))}
+.sb-logo-t h2{color:var(--gold);font-size:.87rem;font-weight:800;letter-spacing:1.5px}
+.sb-logo-t p{color:rgba(238,245,236,.36);font-size:.66rem;margin-top:.1rem}
+.sb-user{padding:.6rem .9rem;margin:.5rem .8rem;background:rgba(197,170,16,.09);
+  border-radius:10px;border:1px solid rgba(197,170,16,.17);display:flex;align-items:center;gap:.6rem}
+.sb-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));
+  display:flex;align-items:center;justify-content:center;color:var(--g900);font-weight:800;font-size:.8rem;flex-shrink:0}
+.sb-uname{color:var(--gold2);font-size:.8rem;font-weight:700}
+.sb-urole{color:rgba(238,245,236,.38);font-size:.65rem}
+.sb-sec{padding:.55rem 1rem .2rem;color:rgba(238,245,236,.28);font-size:.66rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
+.sb-item{display:flex;align-items:center;gap:.65rem;padding:.68rem 1.3rem;
+  color:rgba(238,245,236,.65);font-size:.85rem;font-weight:500;cursor:pointer;
+  border-right:3px solid transparent;transition:all .2s;white-space:nowrap}
+.sb-item:hover{background:rgba(255,255,255,.07);color:#eef5ec}
+.sb-item.on{background:rgba(197,170,16,.12);color:var(--gold2);font-weight:700;border-right-color:var(--gold)}
+.sb-item svg{width:17px;height:17px;flex-shrink:0}
+.sb-badge{margin-right:auto;background:var(--gold);color:var(--g900);font-size:.66rem;font-weight:800;padding:.12rem .48rem;border-radius:50px}
+.sb-foot{padding:1rem 1.3rem;border-top:1px solid rgba(197,170,16,.12);margin-top:auto}
+.sb-view-btn{display:flex;align-items:center;gap:.5rem;color:rgba(238,245,236,.35);font-size:.76rem;
+  margin-bottom:.65rem;transition:color .2s;cursor:pointer;background:none;border:none;font-family:inherit;padding:0;width:100%}
+.sb-view-btn:hover{color:var(--gold2)}
+.sb-logout{display:flex;align-items:center;gap:.5rem;color:rgba(238,245,236,.38);font-size:.8rem;
+  cursor:pointer;transition:color .2s}
+.sb-logout:hover{color:#ff8080}
+
+/* ── Main ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.topbar{background:#fff;padding:.8rem 1.8rem;display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 1px 8px rgba(0,0,0,.07);position:sticky;top:0;z-index:50;flex-wrap:wrap;gap:.7rem}
+.tb-left{display:flex;align-items:center;gap:.8rem}
+.hmbg{display:none;background:none;border:none;font-size:1.35rem;cursor:pointer;color:var(--g700)}
+.tb-title{font-size:1.05rem;font-weight:800;color:var(--g800)}
+.tb-crumb{font-size:.7rem;color:var(--muted)}
+.tb-right{display:flex;align-items:center;gap:.7rem}
+.tb-user{display:flex;align-items:center;gap:.6rem;background:var(--g050);border-radius:50px;padding:.35rem .85rem .35rem .45rem}
+.tb-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));
+  display:flex;align-items:center;justify-content:center;color:var(--g900);font-weight:800;font-size:.78rem}
+.tb-uname{font-size:.82rem;font-weight:700;color:var(--g700)}
+.tb-role{font-size:.65rem;color:var(--muted)}
+.tb-icon{width:34px;height:34px;border-radius:8px;background:var(--g050);
+  display:flex;align-items:center;justify-content:center;color:var(--g700);cursor:pointer;
+  transition:all .2s;position:relative;flex-shrink:0}
+.tb-icon:hover{background:var(--g100)}
+.tb-dot{position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:#ef4444}
+
+/* ── Toolbar floating (save/back/exit) ── */
+.action-bar{
+  display:flex;align-items:center;gap:.7rem;padding:.6rem 1.8rem;
+  background:linear-gradient(90deg,rgba(22,48,32,.03),rgba(197,170,16,.05));
+  border-bottom:1px solid rgba(0,0,0,.04);flex-wrap:wrap}
+.ab-info{font-size:.78rem;color:var(--muted);flex:1}
+.ab-info span{color:var(--gold);font-weight:700}
+
+/* ── Content ── */
+.content{flex:1;overflow-y:auto;padding:1.6rem 2rem;background:#eff1ee}
+.page{display:none}.page.on{display:block;animation:fadeUp .25s ease}
+
+/* ── Dashboard widgets ── */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:1.1rem;margin-bottom:1.5rem}
+.scard{background:#fff;border-radius:var(--r);padding:1.3rem 1.5rem;box-shadow:0 2px 10px rgba(0,0,0,.05);
+  border:1.5px solid #e8eee6;display:flex;align-items:center;gap:.9rem;transition:all .2s}
+.scard:hover{transform:translateY(-2px);box-shadow:var(--sh2)}
+.sico{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.sico.g{background:var(--g100)}.sico.y{background:rgba(197,170,16,.12)}.sico.b{background:rgba(59,130,246,.1)}.sico.r{background:rgba(239,68,68,.08)}
+.snum{font-size:1.85rem;font-weight:900;color:var(--g800);font-family:'Poppins',sans-serif;line-height:1}
+.slbl{font-size:.76rem;color:var(--muted);margin-top:.22rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.3rem}
+@media(max-width:860px){.two-col{grid-template-columns:1fr}}
+.widget{background:#fff;border-radius:var(--r);padding:1.3rem 1.5rem;box-shadow:0 1px 8px rgba(0,0,0,.05);margin-bottom:1.3rem}
+.w-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.4rem}
+.w-title{font-size:.9rem;font-weight:700;color:var(--g800)}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;flex-wrap:wrap;gap:.7rem}
+.sec-hdr h2{font-size:1.08rem;font-weight:800;color:var(--g800)}
+.qlinks{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:.85rem}
+.qcard{background:#fff;border-radius:var(--r);padding:1rem 1.2rem;border:1.5px solid #e8eee6;
+  cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:.9rem}
+.qcard:hover{transform:translateY(-2px);box-shadow:var(--sh2);border-color:rgba(48,77,48,.28)}
+.qico{font-size:1.4rem;flex-shrink:0}.qcard h4{font-size:.87rem;font-weight:700;color:var(--g800)}
+.qcard p{font-size:.74rem;color:var(--muted);margin-top:.1rem}
+
+/* ── Tables ── */
+.tbl-wrap{background:#fff;border-radius:var(--r);box-shadow:0 1px 8px rgba(0,0,0,.05);overflow:hidden;margin-bottom:1.3rem}
+.tbl{width:100%;border-collapse:collapse;font-size:.84rem}
+.tbl th{background:var(--g050);color:var(--g700);font-weight:700;padding:.75rem 1rem;text-align:right;font-size:.76rem;letter-spacing:.4px}
+.tbl td{padding:.75rem 1rem;border-top:1px solid #f0f0f0;vertical-align:middle}
+.tbl tr:hover td{background:#fafdf9}
+.cthumb{width:36px;height:36px;object-fit:contain;border-radius:7px}
+.acts{display:flex;gap:.35rem;align-items:center}
+.bpill{display:inline-block;padding:.2rem .7rem;border-radius:50px;font-size:.71rem;font-weight:700}
+.bp-on{background:rgba(48,77,48,.12);color:var(--g600)}
+.bp-off{background:rgba(239,68,68,.1);color:#dc2626}
+.bp-pend{background:rgba(245,158,11,.1);color:#b45309}
+
+/* ── User cards ── */
+.ugrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:1rem}
+.ucard{background:#fff;border-radius:var(--r);padding:1.2rem;border:1.5px solid #e8eee6;
+  box-shadow:0 1px 6px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:.8rem;transition:all .2s}
+.ucard:hover{box-shadow:var(--sh2);border-color:rgba(48,77,48,.22)}
+.ucard-top{display:flex;align-items:center;gap:.85rem}
+.uav{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:1.05rem;font-weight:800;flex-shrink:0;color:#fff}
+.uname{font-size:.9rem;font-weight:700;color:var(--g800)}
+.uemail{font-size:.74rem;color:var(--muted);margin-top:.08rem;word-break:break-all}
+.umeta{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap}
+.uacts{display:flex;gap:.45rem}
+.role-badge{display:inline-flex;align-items:center;gap:.28rem;padding:.2rem .65rem;border-radius:50px;font-size:.71rem;font-weight:700}
+.rb-super{background:rgba(139,92,246,.12);color:#7c3aed}
+.rb-dean{background:rgba(14,165,233,.12);color:#0369a1}
+.rb-editor{background:rgba(245,158,11,.12);color:#b45309}
+.rb-viewer{background:rgba(107,114,128,.1);color:#4b5563}
+
+/* ── Perm matrix ── */
+.pmtbl{width:100%;border-collapse:collapse;font-size:.82rem}
+.pmtbl th{background:var(--g050);color:var(--g700);padding:.7rem .9rem;text-align:right;font-size:.75rem;font-weight:700}
+.pmtbl td{padding:.7rem .9rem;border-top:1px solid #f0f0f0;text-align:center}
+.pmtbl td:first-child{text-align:right;font-weight:600;color:var(--g700);text-align:right}
+.chk{color:#22c55e;font-size:1rem}.crs{color:#e5e7eb}.par{color:var(--gold);font-size:.74rem}
+
+/* ── Audit log ── */
+.al-type{display:inline-block;padding:.17rem .58rem;border-radius:50px;font-size:.69rem;font-weight:700}
+.al-login{background:rgba(34,197,94,.12);color:#15803d}
+.al-edit{background:rgba(14,165,233,.12);color:#0369a1}
+.al-create{background:rgba(245,158,11,.12);color:#b45309}
+.al-delete{background:rgba(239,68,68,.1);color:#dc2626}
+.al-upload{background:rgba(139,92,246,.12);color:#7c3aed}
+.al-logout{background:rgba(107,114,128,.1);color:#4b5563}
+
+/* ── Security bars ── */
+.sbar{display:flex;align-items:center;gap:.65rem;background:rgba(34,197,94,.07);border:1.5px solid rgba(34,197,94,.18);
+  border-radius:10px;padding:.6rem .9rem;font-size:.82rem;color:#166534;font-weight:600;margin-bottom:.7rem}
+.sbar.warn{background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.22);color:#92400e}
+.sbar.danger{background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.18);color:#991b1b}
+
+/* ── Integrations ── */
+.intg{background:#fff;border-radius:var(--r);padding:1.1rem 1.3rem;border:1.5px solid #e8eee6;
+  display:flex;align-items:center;gap:.9rem;transition:all .2s}
+.intg:hover{box-shadow:var(--sh2);border-color:rgba(48,77,48,.22)}
+.iico{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.iname{font-size:.88rem;font-weight:700;color:var(--g800)}.idesc{font-size:.73rem;color:var(--muted);margin-top:.12rem}
+.sp-online{background:rgba(34,197,94,.12);color:#15803d}
+.sp-pending{background:rgba(245,158,11,.12);color:#b45309}
+.sp-offline{background:rgba(239,68,68,.1);color:#dc2626}
+.spill{display:inline-flex;align-items:center;gap:.28rem;padding:.22rem .7rem;border-radius:50px;font-size:.71rem;font-weight:700}
+.spill::before{content:'';width:6px;height:6px;border-radius:50%}
+.sp-online::before{background:#22c55e}.sp-pending::before{background:#f59e0b}.sp-offline::before{background:#ef4444}
+
+/* ── Perf bars ── */
+.pb-wrap{margin-bottom:.9rem}
+.pb-hdr{display:flex;justify-content:space-between;margin-bottom:.35rem}
+.pb-hdr span:first-child{font-size:.83rem;font-weight:600;color:var(--g700)}
+.pb-hdr span:last-child{font-size:.78rem;color:var(--muted);font-family:'Poppins',sans-serif;font-weight:700}
+.pb-track{height:7px;background:#e8eee6;border-radius:50px;overflow:hidden}
+.pb-fill{height:100%;border-radius:50px;transition:width 1.1s cubic-bezier(.4,0,.2,1)}
+.pf-g{background:linear-gradient(90deg,var(--g500),var(--g400))}.pf-y{background:linear-gradient(90deg,var(--gold),var(--gold2))}.pf-b{background:linear-gradient(90deg,#3b82f6,#60a5fa)}.pf-r{background:linear-gradient(90deg,#f87171,#ef4444)}
+
+/* ── Ring ── */
+.ring-wrap{position:relative;width:96px;height:96px;margin:0 auto}
+.ring-svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:#e8eee6;stroke-width:8}
+.ring-fg{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dasharray 1s ease}
+.ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-num{font-size:1.2rem;font-weight:900;color:var(--g800);font-family:'Poppins',sans-serif;line-height:1}
+.ring-sub{font-size:.62rem;color:var(--muted);margin-top:.18rem}
+
+/* ── Page editor ── */
+.pse{background:#fff;border:1.5px solid #e8eee6;border-radius:var(--r);margin-bottom:.85rem;overflow:hidden}
+.pse-hdr{display:flex;align-items:center;gap:.75rem;padding:.9rem 1.1rem;cursor:pointer;background:#fafdf9;user-select:none}
+.pse-hdr h4{flex:1;font-size:.88rem;font-weight:700;color:var(--g700)}
+.pse-caret{transition:transform .25s;color:var(--muted);font-size:.75rem}
+.pse.open .pse-caret{transform:rotate(180deg)}
+.pse-body{display:none;padding:1.1rem}
+.pse.open .pse-body{display:block}
+.sec-block{border:1.5px solid #e8eee6;border-radius:10px;padding:.9rem;margin-bottom:.7rem}
+.sec-block.hidden-sec{border-color:#ffe0e0;background:#fff8f8}
+
+/* ── Media grid ── */
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:.85rem;margin-top:1.1rem}
+.mcell{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);transition:transform .2s}
+.mcell:hover{transform:scale(1.04)}
+.mcell img{width:100%;height:88px;object-fit:cover;cursor:zoom-in;display:block}
+.mcell-name{padding:.38rem .55rem;font-size:.68rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── Tabs ── */
+.tabs{display:flex;gap:.25rem;border-bottom:2px solid #e8eee6;margin-bottom:1.3rem;flex-wrap:wrap}
+.tab{padding:.55rem 1.1rem;border-radius:8px 8px 0 0;font-size:.83rem;font-weight:600;color:var(--muted);
+  cursor:pointer;border:none;background:none;font-family:inherit;margin-bottom:-2px;
+  border-bottom:2px solid transparent;transition:all .2s}
+.tab:hover{color:var(--g700);background:var(--g050)}
+.tab.on{color:var(--g700);border-bottom-color:var(--gold);background:var(--g050)}
+.tabp{display:none}.tabp.on{display:block;animation:fadeUp .22s ease}
+
+/* ── Toggle ── */
+.tog-wrap{display:flex;align-items:center;gap:.65rem;cursor:pointer}
+.tog{width:42px;height:22px;background:#ddd;border-radius:50px;position:relative;transition:background .2s;flex-shrink:0}
+.tog::after{content:'';position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:transform .2s}
+.tog.on{background:var(--g500)}.tog.on::after{transform:translateX(-20px)}
+
+/* ── Modal ── */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.52);backdrop-filter:blur(4px);z-index:800;align-items:center;justify-content:center;padding:1.5rem}
+.modal.open{display:flex;animation:fadeIn .2s ease}
+.mbox{background:#fff;border-radius:22px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.28);animation:popIn .3s cubic-bezier(.34,1.56,.64,1) both}
+.mhdr{padding:1.3rem 1.8rem;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1;border-radius:22px 22px 0 0}
+.mhdr h3{font-size:1rem;font-weight:800;color:var(--g800)}
+.mclose{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;background:none;border:none;font-size:1rem;transition:all .2s}
+.mclose:hover{background:#f0f0f0;color:var(--text)}
+.mbody{padding:1.5rem 1.8rem}
+.mfoot{padding:1.1rem 1.8rem;border-top:1px solid #eee;display:flex;gap:.6rem;justify-content:flex-end}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
+.ff{display:flex;flex-direction:column;gap:.4rem}.ff.full{grid-column:1/-1}
+.ff label{font-size:.82rem;font-weight:700;color:var(--g700)}
+.ff input,.ff textarea,.ff select{padding:.68rem .95rem;border:1.5px solid #dde8da;border-radius:9px;
+  font-family:'Cairo','Poppins',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s,box-shadow .2s;color:var(--text);background:#fff}
+.ff input:focus,.ff textarea:focus,.ff select:focus{border-color:var(--g500);box-shadow:0 0 0 3px rgba(48,77,48,.09)}
+.ff textarea{resize:vertical;min-height:80px}
+.uarea{border:2px dashed #c8d8c4;border-radius:var(--r);padding:1.5rem;text-align:center;cursor:pointer;background:#fafdf9;transition:all .2s}
+.uarea:hover{border-color:var(--g500);background:var(--g050)}
+.uarea p{color:var(--muted);font-size:.82rem;margin-top:.4rem}
+
+/* ── Notif ── */
+.notif{position:fixed;top:1.3rem;right:1.4rem;z-index:2000;background:#fff;border-radius:12px;
+  box-shadow:0 8px 32px rgba(0,0,0,.18);padding:.85rem 1.3rem;display:flex;align-items:center;gap:.65rem;
+  font-size:.86rem;font-weight:600;transform:translateY(-20px);opacity:0;pointer-events:none;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:320px}
+.notif.show{transform:translateY(0);opacity:1;pointer-events:auto}
+.notif.success{border-right:4px solid #22c55e}
+.notif.error{border-right:4px solid #ef4444}
+
+/* ── Lightbox ── */
+.lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:1500;align-items:center;justify-content:center;backdrop-filter:blur(5px)}
+.lb.open{display:flex;animation:fadeIn .2s ease}
+.lb img{max-width:90vw;max-height:88vh;border-radius:var(--r);box-shadow:0 20px 60px rgba(0,0,0,.7);animation:popIn .28s ease}
+.lb-x{position:absolute;top:1.2rem;right:1.4rem;color:#fff;font-size:1.8rem;cursor:pointer;opacity:.65;transition:opacity .2s;line-height:1}
+.lb-x:hover{opacity:1}
+
+/* Mobile */
+@media(max-width:768px){
+  .sb{position:fixed;height:100%;transform:translateX(100%);transition:transform .3s;z-index:500}
+  .sb.open{transform:none}
+  .hmbg{display:flex;align-items:center}
+  .content{padding:1rem}
+  .two-col{grid-template-columns:1fr}
+  .fgrid{grid-template-columns:1fr}
+  .action-bar{padding:.5rem 1rem}
+}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--g200);border-radius:50px}
+</style>
+</head>
+<body>
+<div class="wrap" id="appWrap">
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sb" id="sidebar">
+  <div class="sb-logo">
+    <img src="1.png" alt="Logo" onerror="this.style.display='none'">
+    <div class="sb-logo-t"><h2>TIKRIT UNIV.</h2><p>نظام الإدارة المتكامل</p></div>
+  </div>
+  <div class="sb-user">
+    <div class="sb-av" id="sbAv">م</div>
+    <div><div class="sb-uname" id="sbName">مدير النظام</div><div class="sb-urole" id="sbRole">Super Admin</div></div>
+  </div>
+  <nav style="flex:1;overflow-y:auto;padding:.6rem 0">
+    <div class="sb-sec">الرئيسية</div>
+    <div class="sb-item on" data-p="dash">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>لوحة المعلومات
+    </div>
+    <div class="sb-sec">المحتوى</div>
+    <div class="sb-item" data-p="pages">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>إدارة الصفحات<span class="sb-badge">5</span>
+    </div>
+    <div class="sb-item" data-p="colleges">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>إدارة الكليات<span class="sb-badge" id="colBadge">4</span>
+    </div>
+    <div class="sb-item" data-p="media">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>مكتبة الوسائط
+    </div>
+    <div class="sb-sec">الإدارة</div>
+    <div class="sb-item" data-p="users" id="navUsers">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>المستخدمون والأدوار<span class="sb-badge" id="usrBadge">3</span>
+    </div>
+    <div class="sb-item" data-p="security">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>الأمان وسجلات التدقيق
+    </div>
+    <div class="sb-item" data-p="integrations">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>التكاملات والـ APIs
+    </div>
+    <div class="sb-item" data-p="scalability">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>الأداء والتوسع
+    </div>
+    <div class="sb-sec">الإعدادات</div>
+    <div class="sb-item" data-p="settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>الإعدادات العامة
+    </div>
+  </nav>
+  <div class="sb-foot">
+    <!-- أزرار روابط الموقع في الشريط الجانبي -->
+    <div style="display:flex;flex-direction:column;gap:.3rem;margin-bottom:.6rem">
+      <!-- الزر الرئيسي: يفتح الصفحة المرتبطة بالقسم الحالي مباشرة -->
+      <button class="sb-view-btn" onclick="goToCurrentSite()" id="sbSiteBtn"
+        title="فتح الموقع الرئيسي">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        <span id="sbSiteLabel">الموقع الرئيسي</span>
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:auto;margin-left:0;opacity:.45"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <!-- روابط الكليات الأربع مباشرة -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.28rem">
+        <a href="MohammedMahdy.html"  target="_blank" class="sb-view-btn"
+           style="font-size:.68rem;text-decoration:none;padding:.3rem .4rem"
+           onclick="addLog('view','عرض: الرئيسية')">🏛 الرئيسية</a>
+        <a href="MohammedMahdy1.html" target="_blank" class="sb-view-btn"
+           style="font-size:.68rem;text-decoration:none;padding:.3rem .4rem"
+           onclick="addLog('view','عرض: الحاسوب')">💻 الحاسوب</a>
+        <a href="MohammedMahdy2.html" target="_blank" class="sb-view-btn"
+           style="font-size:.68rem;text-decoration:none;padding:.3rem .4rem"
+           onclick="addLog('view','عرض: الهندسة')">⚙️ الهندسة</a>
+        <a href="MohammedMahdy3.html" target="_blank" class="sb-view-btn"
+           style="font-size:.68rem;text-decoration:none;padding:.3rem .4rem"
+           onclick="addLog('view','عرض: الأسنان')">🦷 الأسنان</a>
+        <a href="MohammedMahdy4.html" target="_blank" class="sb-view-btn"
+           style="font-size:.68rem;text-decoration:none;padding:.3rem .4rem;grid-column:1/-1"
+           onclick="addLog('view','عرض: الإدارة')">📊 الإدارة والاقتصاد</a>
+      </div>
+    </div>
+    <div class="sb-logout" onclick="doLogout()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      تسجيل الخروج
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="tb-left">
+      <button class="hmbg" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+      <div><div class="tb-title" id="tbTitle">لوحة المعلومات</div><div class="tb-crumb" id="tbCrumb">الرئيسية</div></div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-icon" onclick="goP('security')" title="الإشعارات">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="tb-dot" id="notifDot"></span>
+      </div>
+      <div class="tb-user">
+        <div class="tb-av" id="tbAv">م</div>
+        <div><div class="tb-uname" id="tbName">مدير النظام</div><div class="tb-role" id="tbRole">Super Admin</div></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Action bar (save / back / exit) -->
+  <div class="action-bar" id="actionBar">
+    <div class="ab-info">
+      <span style="color:var(--g600);font-size:.85rem">🏛</span>
+      لوحة تحكم <span>جامعة تكريت</span>
+      <span id="abPageName" style="color:var(--muted);font-size:.75rem"> — لوحة المعلومات</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:.45rem;flex-wrap:wrap">
+
+      <!-- حفظ -->
+      <button class="btn btn-primary btn-sm" onclick="saveAll()" id="saveBtn" title="حفظ (Ctrl+S)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        حفظ الكل
+      </button>
+
+      <!-- رجوع ذكي -->
+      <button class="btn btn-ghost btn-sm" onclick="smartBack()" id="backBtn" title="رجوع">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        رجوع
+      </button>
+
+      <!-- لوحة الرئيسية -->
+      <button class="btn btn-ghost btn-sm" onclick="goP('dash')" title="لوحة المعلومات">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        الرئيسية
+      </button>
+
+      <!-- فاصل -->
+      <div style="width:1px;height:22px;background:#e0e0e0;margin:0 .1rem"></div>
+
+      <!-- زر "عرض الموقع" الرئيسي: يتغير تلقائياً حسب القسم المفتوح -->
+      <button class="btn btn-gold btn-sm" onclick="goToCurrentSite()" id="siteBackBtn"
+        title="فتح الموقع الرئيسي">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        <span id="siteBackLabel">الموقع الرئيسي</span>
+      </button>
+
+      <!-- اختيار أي صفحة من الموقع -->
+      <button class="btn btn-ghost btn-sm" onclick="openM('siteNavModal')"
+        title="تصفح كل صفحات الموقع" style="padding:.38rem .55rem">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        <span style="font-size:.72rem">▾</span>
+      </button>
+
+      <!-- فاصل -->
+      <div style="width:1px;height:22px;background:#e0e0e0;margin:0 .1rem"></div>
+
+      <!-- خروج -->
+      <button class="btn btn-sm" style="background:rgba(239,68,68,.09);color:#dc2626;border:1.5px solid rgba(239,68,68,.18)" onclick="doLogout()" title="تسجيل الخروج">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        خروج
+      </button>
+    </div>
+  </div>
+
+  <!-- Content area -->
+  <div class="content">
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div class="page on" id="pg-dash">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.3rem;flex-wrap:wrap;gap:.7rem">
+        <div><h2 style="font-size:1.22rem;font-weight:800;color:var(--g800)" id="wMsg">مرحباً 👋</h2><p style="color:var(--muted);font-size:.8rem;margin-top:.18rem" id="wDate"></p></div>
+        <div style="display:flex;gap:.6rem">
+          <button class="btn btn-gold btn-sm" onclick="goP('colleges')">+ إضافة كلية</button>
+          <button class="btn btn-primary btn-sm" onclick="goP('pages')">تعديل المحتوى</button>
+        </div>
+      </div>
+      <div class="stat-grid">
+        <div class="scard"><div class="sico g">🏛</div><div><div class="snum" data-c="10">0</div><div class="slbl">صفحات منشورة</div></div></div>
+        <div class="scard"><div class="sico y">🎓</div><div><div class="snum" data-c="4" id="dashColCount">0</div><div class="slbl">كليات نشطة</div></div></div>
+        <div class="scard"><div class="sico b">👥</div><div><div class="snum" data-c="3" id="dashUsrCount">0</div><div class="slbl">مستخدمو الإدارة</div></div></div>
+        <div class="scard"><div class="sico r">🔒</div><div><div class="snum" data-c="0">0</div><div class="slbl">تهديدات اليوم</div></div></div>
+      </div>
+      <div class="two-col">
+        <div class="widget"><div class="w-hdr"><div class="w-title">📋 آخر النشاطات</div><button class="btn btn-ghost btn-sm" onclick="goP('security')">الكل</button></div><div id="dashAct"></div></div>
+        <div class="widget">
+          <div class="w-hdr"><div class="w-title">⚡ حالة الخوادم</div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;text-align:center;margin-bottom:1rem">
+            <div><div class="ring-wrap"><svg class="ring-svg" width="96" height="96" viewBox="0 0 96 96"><circle class="ring-bg" cx="48" cy="48" r="38"/><circle class="ring-fg" cx="48" cy="48" r="38" id="r1" stroke="var(--g500)" stroke-dasharray="0 239"/></svg><div class="ring-label"><div class="ring-num" id="rv1">0%</div><div class="ring-sub">CPU</div></div></div></div>
+            <div><div class="ring-wrap"><svg class="ring-svg" width="96" height="96" viewBox="0 0 96 96"><circle class="ring-bg" cx="48" cy="48" r="38"/><circle class="ring-fg" cx="48" cy="48" r="38" id="r2" stroke="var(--gold)" stroke-dasharray="0 239"/></svg><div class="ring-label"><div class="ring-num" id="rv2">0%</div><div class="ring-sub">RAM</div></div></div></div>
+            <div><div class="ring-wrap"><svg class="ring-svg" width="96" height="96" viewBox="0 0 96 96"><circle class="ring-bg" cx="48" cy="48" r="38"/><circle class="ring-fg" cx="48" cy="48" r="38" id="r3" stroke="#3b82f6" stroke-dasharray="0 239"/></svg><div class="ring-label"><div class="ring-num" id="rv3">0</div><div class="ring-sub">Req/s</div></div></div></div>
+          </div>
+          <div class="sbar">✅ جميع الخوادم تعمل — Uptime: 99.8%</div>
+        </div>
+      </div>
+      <div class="widget"><div class="w-hdr"><div class="w-title">🔗 وصول سريع</div></div>
+        <div class="qlinks">
+          <div class="qcard" onclick="goP('colleges')"><div class="qico">🎓</div><div><h4>إضافة كلية</h4><p>إدارة الكليات</p></div></div>
+          <div class="qcard" onclick="goP('pages')"><div class="qico">📝</div><div><h4>تعديل المحتوى</h4><p>نصوص وصور</p></div></div>
+          <div class="qcard" onclick="goP('users')"><div class="qico">👤</div><div><h4>المستخدمون</h4><p>الصلاحيات والأدوار</p></div></div>
+          <div class="qcard" onclick="goP('security')"><div class="qico">🔒</div><div><h4>سجلات التدقيق</h4><p>مراجعة العمليات</p></div></div>
+          <div class="qcard" onclick="goP('integrations')"><div class="qico">🔌</div><div><h4>التكاملات</h4><p>الأنظمة المرتبطة</p></div></div>
+          <div class="qcard" onclick="window.open('MohammedMahdy.html','_blank');addLog('view','فتح الموقع الرئيسي من الوصول السريع')">
+            <div class="qico">🌐</div>
+            <div><h4>الموقع الرئيسي</h4><p>فتح في تبويب جديد</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGES ═══ -->
+    <div class="page" id="pg-pages">
+      <div class="sec-hdr"><h2>إدارة الصفحات</h2><span style="color:var(--muted);font-size:.8rem">5 صفحات — انقر لتوسيع</span></div>
+      <div id="pseList"></div>
+    </div>
+
+    <!-- ═══ COLLEGES ═══ -->
+    <div class="page" id="pg-colleges">
+      <div class="sec-hdr"><h2>إدارة الكليات</h2>
+        <button class="btn btn-gold" id="addColBtn" onclick="openColModal()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          إضافة كلية
+        </button>
+      </div>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr>
+        <th>الشعار</th><th>الاسم عربي</th><th>الاسم إنجليزي</th><th>التأسيس</th><th>الحالة</th><th>المشرف</th><th>الإجراءات</th>
+      </tr></thead><tbody id="colBody"></tbody></table></div>
+    </div>
+
+    <!-- ═══ MEDIA ═══ -->
+    <div class="page" id="pg-media">
+      <div class="sec-hdr"><h2>مكتبة الوسائط</h2>
+        <button class="btn btn-gold" onclick="document.getElementById('fInput').click()">☁️ رفع ملفات</button>
+      </div>
+      <input type="file" id="fInput" multiple accept="image/*" style="display:none" onchange="handleUpload(this)">
+      <div class="uarea" onclick="document.getElementById('fInput').click()" style="margin-bottom:1.2rem">
+        <div style="font-size:2.2rem">☁️</div><p>اسحب الملفات هنا أو انقر للاختيار</p>
+        <p style="font-size:.74rem;margin-top:.3rem">PNG, JPG, WebP</p>
+      </div>
+      <div class="mgrid" id="mGrid"></div>
+    </div>
+
+    <!-- ═══ USERS ═══ -->
+    <div class="page" id="pg-users">
+      <div class="sec-hdr"><h2>المستخدمون والصلاحيات</h2>
+        <button class="btn btn-gold" id="addUsrBtn" onclick="openUsrModal()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          إضافة مستخدم
+        </button>
+      </div>
+      <div class="tabs">
+        <button class="tab on" data-t="t-ul">👥 المستخدمون</button>
+        <button class="tab" data-t="t-pm">🔑 مصفوفة الصلاحيات</button>
+      </div>
+      <div class="tabp on" id="t-ul"><div class="ugrid" id="uGrid"></div></div>
+      <div class="tabp" id="t-pm"><div class="tbl-wrap"><table class="pmtbl"><thead><tr>
+        <th>الصلاحية</th><th>🟣 Super Admin</th><th>🔵 عميد الكلية</th><th>🟡 محرر</th><th>⚪ مشاهد</th>
+      </tr></thead><tbody id="pmBody"></tbody></table></div></div>
+    </div>
+
+    <!-- ═══ SECURITY ═══ -->
+    <div class="page" id="pg-security">
+      <div class="sec-hdr"><h2>الأمان وسجلات التدقيق</h2></div>
+      <div class="two-col" style="margin-bottom:1.2rem">
+        <div class="sbar">🔒 SSL/TLS مفعّل — صالح حتى 2025/12</div>
+        <div class="sbar">📱 المصادقة الثنائية مفعّلة لجميع المديرين</div>
+      </div>
+      <div class="tabs">
+        <button class="tab on" data-t="t-sl">📋 سجل التدقيق</button>
+        <button class="tab" data-t="t-thr">⚠️ التهديدات</button>
+        <button class="tab" data-t="t-2fa">📱 إعدادات 2FA</button>
+      </div>
+      <div class="tabp on" id="t-sl">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:.8rem">
+          <button class="btn btn-ghost btn-sm" onclick="clearLogs()">مسح السجل</button>
+        </div>
+        <div class="tbl-wrap"><table class="tbl"><thead><tr>
+          <th>المستخدم</th><th>النوع</th><th>العملية</th><th>IP</th><th>الوقت</th>
+        </tr></thead><tbody id="aBody"></tbody></table></div>
+      </div>
+      <div class="tabp" id="t-thr">
+        <div class="widget">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:.9rem;margin-bottom:1.1rem">
+            <div style="text-align:center;background:rgba(34,197,94,.06);border-radius:var(--r);padding:.9rem"><div style="font-size:1.8rem;font-weight:900;color:#16a34a;font-family:'Poppins',sans-serif">0</div><div style="font-size:.73rem;color:var(--muted)">اختراقات</div></div>
+            <div style="text-align:center;background:rgba(245,158,11,.06);border-radius:var(--r);padding:.9rem"><div style="font-size:1.8rem;font-weight:900;color:#b45309;font-family:'Poppins',sans-serif" id="failCnt">0</div><div style="font-size:.73rem;color:var(--muted)">محاولات فاشلة</div></div>
+            <div style="text-align:center;background:rgba(34,197,94,.06);border-radius:var(--r);padding:.9rem"><div style="font-size:1.8rem;font-weight:900;color:#16a34a;font-family:'Poppins',sans-serif">99.8%</div><div style="font-size:.73rem;color:var(--muted)">Uptime</div></div>
+          </div>
+          <div class="sbar" style="margin-bottom:.6rem">✅ لا تهديدات نشطة</div>
+          <div class="sbar warn">⚠️ آخر تحديث للنظام منذ 14 يوماً</div>
+        </div>
+      </div>
+      <div class="tabp" id="t-2fa">
+        <div class="widget" style="max-width:460px">
+          <div class="w-title" style="margin-bottom:1rem">📱 إعدادات المصادقة الثنائية</div>
+          <div style="display:flex;flex-direction:column;gap:.8rem">
+            <label class="tog-wrap"><div class="tog on" onclick="this.classList.toggle('on')"></div><span style="font-size:.87rem">إلزامية لـ Super Admin</span></label>
+            <label class="tog-wrap"><div class="tog on" onclick="this.classList.toggle('on')"></div><span style="font-size:.87rem">إلزامية لعمداء الكليات</span></label>
+            <label class="tog-wrap"><div class="tog on" onclick="this.classList.toggle('on')"></div><span style="font-size:.87rem">إلزامية للمحررين</span></label>
+            <label class="tog-wrap"><div class="tog" onclick="this.classList.toggle('on')"></div><span style="font-size:.87rem">إلزامية للمشاهدين</span></label>
+          </div>
+          <button class="btn btn-primary btn-sm" style="margin-top:1rem" onclick="saveAll()">حفظ</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ INTEGRATIONS ═══ -->
+    <div class="page" id="pg-integrations">
+      <div class="sec-hdr"><h2>التكاملات والـ APIs</h2></div>
+      <div class="tabs">
+        <button class="tab on" data-t="t-is">🔌 الأنظمة</button>
+        <button class="tab" data-t="t-api">🛠 API</button>
+        <button class="tab" data-t="t-lng">🌐 اللغات والـ WCAG</button>
+      </div>
+      <div class="tabp on" id="t-is">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:.95rem">
+          <div class="intg"><div class="iico" style="background:rgba(34,197,94,.1)">📚</div><div style="flex:1"><div class="iname">Moodle LMS</div><div class="idesc">نظام إدارة التعلم الإلكتروني</div></div><span class="spill sp-online">متصل</span></div>
+          <div class="intg"><div class="iico" style="background:rgba(59,130,246,.1)">🎓</div><div style="flex:1"><div class="iname">Student Info System</div><div class="idesc">نظام معلومات الطلاب</div></div><span class="spill sp-online">متصل</span></div>
+          <div class="intg"><div class="iico" style="background:rgba(245,158,11,.1)">💳</div><div style="flex:1"><div class="iname">بوابة الدفع الإلكتروني</div><div class="idesc">دفع الرسوم الجامعية</div></div><span class="spill sp-pending">قيد الإعداد</span></div>
+          <div class="intg"><div class="iico" style="background:rgba(139,92,246,.1)">👥</div><div style="flex:1"><div class="iname">نظام الموارد البشرية</div><div class="idesc">إدارة الكادر التدريسي</div></div><span class="spill sp-online">متصل</span></div>
+          <div class="intg"><div class="iico" style="background:rgba(239,68,68,.08)">📧</div><div style="flex:1"><div class="iname">البريد المؤسسي</div><div class="idesc">إشعارات الطلاب والأساتذة</div></div><span class="spill sp-online">متصل</span></div>
+          <div class="intg"><div class="iico" style="background:rgba(14,165,233,.1)">📊</div><div style="flex:1"><div class="iname">Blackboard</div><div class="idesc">منصة التعلم الاحتياطية</div></div><span class="spill sp-offline">غير متصل</span></div>
+        </div>
+      </div>
+      <div class="tabp" id="t-api">
+        <div class="widget" style="max-width:540px">
+          <div class="w-title" style="margin-bottom:1rem">🛠 إعدادات REST API</div>
+          <div class="fgrid">
+            <div class="ff full"><label>Base URL</label><input type="url" value="https://tikrit.edu.iq/api/v1/" style="direction:ltr"></div>
+            <div class="ff"><label>Timeout (ثانية)</label><input type="number" value="30"></div>
+            <div class="ff"><label>Rate Limit / دقيقة</label><input type="number" value="120"></div>
+          </div>
+          <button class="btn btn-primary btn-sm" style="margin-top:1rem" onclick="saveAll()">حفظ الإعدادات</button>
+        </div>
+      </div>
+      <div class="tabp" id="t-lng">
+        <div class="widget">
+          <div class="w-title" style="margin-bottom:1rem">🌐 دعم اللغات</div>
+          <div class="two-col" style="margin-bottom:1.1rem">
+            <div style="background:var(--g050);border-radius:var(--r);padding:1.1rem"><h4 style="font-size:.87rem;font-weight:700;color:var(--g700);margin-bottom:.45rem">🇮🇶 العربية (RTL)</h4><p style="font-size:.8rem;color:var(--muted)">خط Cairo — دعم RTL كامل</p><span class="spill sp-online" style="margin-top:.5rem;display:inline-flex">مفعّل</span></div>
+            <div style="background:#f5f7f4;border-radius:var(--r);padding:1.1rem;direction:ltr;text-align:left"><h4 style="font-size:.87rem;font-weight:700;color:var(--g700);margin-bottom:.45rem">🇬🇧 English (LTR)</h4><p style="font-size:.8rem;color:var(--muted)">Poppins font — Full LTR</p><span class="spill sp-online" style="margin-top:.5rem;display:inline-flex">Active</span></div>
+          </div>
+          <div class="w-title" style="margin-bottom:.8rem">♿ WCAG 2.1</div>
+          <div class="sbar">✅ تباين الألوان يتجاوز 4.5:1</div>
+          <div class="sbar">✅ نص بديل لجميع الصور</div>
+          <div class="sbar warn">⚠️ ARIA: يحتاج مراجعة في 3 صفحات</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SCALABILITY ═══ -->
+    <div class="page" id="pg-scalability">
+      <div class="sec-hdr"><h2>الأداء والقابلية للتوسع</h2></div>
+      <div class="two-col">
+        <div class="widget">
+          <div class="w-title" style="margin-bottom:1rem">📈 استخدام الموارد الآن</div>
+          <div class="pb-wrap"><div class="pb-hdr"><span>CPU</span><span id="pv1">32%</span></div><div class="pb-track"><div class="pb-fill pf-g" id="pb1" style="width:0"></div></div></div>
+          <div class="pb-wrap"><div class="pb-hdr"><span>RAM</span><span id="pv2">58%</span></div><div class="pb-track"><div class="pb-fill pf-y" id="pb2" style="width:0"></div></div></div>
+          <div class="pb-wrap"><div class="pb-hdr"><span>Disk I/O</span><span id="pv3">15%</span></div><div class="pb-track"><div class="pb-fill pf-b" id="pb3" style="width:0"></div></div></div>
+          <div class="pb-wrap"><div class="pb-hdr"><span>Network</span><span id="pv4">44%</span></div><div class="pb-track"><div class="pb-fill pf-r" id="pb4" style="width:0"></div></div></div>
+        </div>
+        <div class="widget">
+          <div class="w-title" style="margin-bottom:1rem">📅 الطاقة الاستيعابية الموسمية</div>
+          <div style="display:flex;flex-direction:column;gap:.7rem">
+            <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(34,197,94,.06);border-radius:10px;padding:.75rem 1rem"><span style="font-size:.82rem;font-weight:600;color:#166534">🟢 أوقات عادية</span><span style="font-weight:800;font-family:'Poppins',sans-serif;color:var(--g800)">~500 زيارة/س</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(245,158,11,.06);border-radius:10px;padding:.75rem 1rem"><span style="font-size:.82rem;font-weight:600;color:#92400e">🟡 فترة القبول</span><span style="font-weight:800;font-family:'Poppins',sans-serif;color:var(--g800)">~8,000 زيارة/س</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(239,68,68,.06);border-radius:10px;padding:.75rem 1rem"><span style="font-size:.82rem;font-weight:600;color:#991b1b">🔴 إعلان النتائج</span><span style="font-weight:800;font-family:'Poppins',sans-serif;color:var(--g800)">~25,000 زيارة/س</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(59,130,246,.06);border-radius:10px;padding:.75rem 1rem"><span style="font-size:.82rem;font-weight:600;color:#1e40af">🔵 طاقة Auto-Scale</span><span style="font-weight:800;font-family:'Poppins',sans-serif;color:var(--g800)">50,000+ زيارة/س</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SETTINGS ═══ -->
+    <div class="page" id="pg-settings">
+      <div class="sec-hdr"><h2>الإعدادات العامة</h2></div>
+      <div style="max-width:640px">
+        <div class="widget">
+          <div class="w-title" style="margin-bottom:1rem">🎨 هوية الموقع</div>
+          <div class="fgrid">
+            <div class="ff"><label>اسم الجامعة (عربي)</label><input type="text" value="جامعة تكريت"></div>
+            <div class="ff"><label>University Name (EN)</label><input type="text" value="Tikrit University" style="direction:ltr"></div>
+            <div class="ff full"><label>وصف الموقع</label><textarea rows="2">جامعة تكريت — محافظة صلاح الدين، العراق</textarea></div>
+          </div>
+        </div>
+        <div class="widget">
+          <div class="w-title" style="margin-bottom:1rem">🎛 خيارات النظام</div>
+          <div style="display:flex;flex-direction:column;gap:.85rem">
+            <label class="tog-wrap"><div class="tog" onclick="this.classList.toggle('on')"></div><div><div style="font-size:.87rem;font-weight:600">وضع الصيانة</div><div style="font-size:.73rem;color:var(--muted)">يُخفي الموقع للزوار</div></div></label>
+            <label class="tog-wrap"><div class="tog on" onclick="this.classList.toggle('on')"></div><div><div style="font-size:.87rem;font-weight:600">الموافقة قبل النشر</div><div style="font-size:.73rem;color:var(--muted)">موافقة المدير على محتوى المحررين</div></div></label>
+            <label class="tog-wrap"><div class="tog on" onclick="this.classList.toggle('on')"></div><div><div style="font-size:.87rem;font-weight:600">تفعيل ذاكرة Cache</div><div style="font-size:.73rem;color:var(--muted)">يُسرّع تحميل الصفحات</div></div></label>
+          </div>
+        </div>
+        <button class="btn btn-gold" onclick="saveAll()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          حفظ جميع الإعدادات
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /wrap -->
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- College modal -->
+<div class="modal" id="colModal">
+  <div class="mbox">
+    <div class="mhdr"><h3 id="colMTitle">إضافة كلية جديدة</h3><button class="mclose" onclick="closeM('colModal')">✕</button></div>
+    <div class="mbody">
+      <input type="hidden" id="eColId">
+      <div class="fgrid">
+        <div class="ff"><label>الاسم (عربي) *</label><input type="text" id="cAr" placeholder="كلية الطب"></div>
+        <div class="ff"><label>Name (English) *</label><input type="text" id="cEn" placeholder="College of Medicine" style="direction:ltr"></div>
+        <div class="ff"><label>سنة التأسيس</label><input type="number" id="cYr" placeholder="2024"></div>
+        <div class="ff"><label>الحالة</label><select id="cSt"><option value="active">نشط</option><option value="hidden">مخفي</option></select></div>
+        <div class="ff"><label>العميد / المشرف</label><input type="text" id="cDe" placeholder="أ.د. ..."></div>
+        <div class="ff"><label>رابط الصفحة</label><input type="text" id="cUrl" style="direction:ltr" placeholder="MohammedMahdy5.html"></div>
+        <div class="ff full"><label>نبذة تعريفية</label><textarea id="cDesc" rows="3"></textarea></div>
+        <div class="ff full">
+          <label>شعار الكلية</label>
+          <div class="uarea" onclick="document.getElementById('logoFile').click()" style="padding:1rem"><div style="font-size:1.5rem">🏛</div><p>انقر لرفع الشعار</p></div>
+          <input type="file" id="logoFile" accept="image/*" style="display:none" onchange="prevLogo(this)">
+          <img id="logoPrev" style="display:none;width:65px;height:65px;object-fit:contain;margin-top:.65rem;border-radius:8px;border:1.5px solid #e0e0e0">
+        </div>
+      </div>
+    </div>
+    <div class="mfoot"><button class="btn btn-ghost" onclick="closeM('colModal')">إلغاء</button><button class="btn btn-gold" onclick="saveCol()">حفظ الكلية</button></div>
+  </div>
+</div>
+
+<!-- User modal -->
+<div class="modal" id="usrModal">
+  <div class="mbox">
+    <div class="mhdr"><h3 id="usrMTitle">إضافة مستخدم جديد</h3><button class="mclose" onclick="closeM('usrModal')">✕</button></div>
+    <div class="mbody">
+      <input type="hidden" id="eUsrId">
+      <div class="fgrid">
+        <div class="ff"><label>الاسم الكامل *</label><input type="text" id="uNm"></div>
+        <div class="ff"><label>اسم الدخول *</label><input type="text" id="uUn" style="direction:ltr"></div>
+        <div class="ff"><label>البريد الإلكتروني *</label><input type="email" id="uEm" style="direction:ltr"></div>
+        <div class="ff"><label>كلمة المرور</label><input type="password" id="uPw" placeholder="اتركه فارغاً للإبقاء"></div>
+        <div class="ff"><label>الدور *</label><select id="uRo" onchange="chkColField()">
+          <option value="super">🟣 Super Admin — تحكم كامل</option>
+          <option value="dean">🔵 عميد كلية — كليته فقط</option>
+          <option value="editor">🟡 محرر — بانتظار موافقة</option>
+          <option value="viewer">⚪ مشاهد — قراءة فقط</option>
+        </select></div>
+        <div class="ff" id="colField" style="display:none"><label>الكلية المرتبطة</label><select id="uCo">
+          <option value="">— اختر —</option>
+          <option value="cs">علوم الحاسوب</option><option value="eng">الهندسة</option>
+          <option value="dent">طب الأسنان</option><option value="mgmt">الإدارة والاقتصاد</option>
+        </select></div>
+      </div>
+    </div>
+    <div class="mfoot"><button class="btn btn-ghost" onclick="closeM('usrModal')">إلغاء</button><button class="btn btn-gold" onclick="saveUsr()">حفظ المستخدم</button></div>
+  </div>
+</div>
+
+<!-- Delete confirm -->
+<div class="modal" id="delModal">
+  <div class="mbox" style="max-width:370px">
+    <div class="mhdr"><h3>تأكيد الحذف</h3><button class="mclose" onclick="closeM('delModal')">✕</button></div>
+    <div class="mbody"><p id="delMsg" style="color:var(--text)"></p><p style="font-size:.82rem;color:var(--muted);margin-top:.5rem">⚠️ لا يمكن التراجع عن هذا الإجراء.</p></div>
+    <div class="mfoot"><button class="btn btn-ghost" onclick="closeM('delModal')">إلغاء</button><button class="btn btn-danger" onclick="confDel()">حذف</button></div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lb" id="lb"><span class="lb-x" onclick="closeLB()">✕</span><img id="lbImg" src="" alt=""></div>
+
+<!-- Site Navigator Modal -->
+<div class="modal" id="siteNavModal">
+  <div class="mbox" style="max-width:520px">
+    <div class="mhdr">
+      <h3>🌐 عرض الموقع الرئيسي</h3>
+      <button class="mclose" onclick="closeM('siteNavModal')">✕</button>
+    </div>
+    <div class="mbody">
+      <p style="font-size:.84rem;color:var(--muted);margin-bottom:1.2rem">اختر الصفحة التي تريد عرضها أو التنقل إليها:</p>
+      <div style="display:flex;flex-direction:column;gap:.65rem">
+        <a href="MohammedMahdy.html" target="_blank" onclick="closeM('siteNavModal');addLog('view','فتح: الصفحة الرئيسية')"
+           style="display:flex;align-items:center;gap:.9rem;padding:1rem 1.2rem;background:#fafdf9;border-radius:12px;border:1.5px solid #e8eee6;transition:all .2s;color:var(--text)"
+           onmouseover="this.style.borderColor='rgba(48,77,48,.3)';this.style.background=getComputedStyle(document.documentElement).getPropertyValue('--g050')"
+           onmouseout="this.style.borderColor='#e8eee6';this.style.background='#fafdf9'">
+          <span style="font-size:1.5rem">🏛</span>
+          <div style="flex:1"><div style="font-weight:700;font-size:.9rem">الصفحة الرئيسية</div><div style="font-size:.75rem;color:var(--muted)">MohammedMahdy.html</div></div>
+          <span style="font-size:.75rem;color:var(--muted)">عربي ←</span>
+        </a>
+        <a href="MohammedMahdy1.html" target="_blank" onclick="closeM('siteNavModal');addLog('view','فتح: الحاسوب')"
+           style="display:flex;align-items:center;gap:.9rem;padding:1rem 1.2rem;background:#fafdf9;border-radius:12px;border:1.5px solid #e8eee6;transition:all .2s;color:var(--text)"
+           onmouseover="this.style.borderColor='rgba(48,77,48,.3)';this.style.background='#eef5ec'"
+           onmouseout="this.style.borderColor='#e8eee6';this.style.background='#fafdf9'">
+          <span style="font-size:1.5rem">💻</span>
+          <div style="flex:1"><div style="font-weight:700;font-size:.9rem">كلية علوم الحاسوب والرياضيات</div><div style="font-size:.75rem;color:var(--muted)">MohammedMahdy1.html</div></div>
+        </a>
+        <a href="MohammedMahdy2.html" target="_blank" onclick="closeM('siteNavModal');addLog('view','فتح: الهندسة')"
+           style="display:flex;align-items:center;gap:.9rem;padding:1rem 1.2rem;background:#fafdf9;border-radius:12px;border:1.5px solid #e8eee6;transition:all .2s;color:var(--text)"
+           onmouseover="this.style.borderColor='rgba(48,77,48,.3)';this.style.background='#eef5ec'"
+           onmouseout="this.style.borderColor='#e8eee6';this.style.background='#fafdf9'">
+          <span style="font-size:1.5rem">⚙️</span>
+          <div style="flex:1"><div style="font-weight:700;font-size:.9rem">كلية الهندسة</div><div style="font-size:.75rem;color:var(--muted)">MohammedMahdy2.html</div></div>
+        </a>
+        <a href="MohammedMahdy3.html" target="_blank" onclick="closeM('siteNavModal');addLog('view','فتح: الأسنان')"
+           style="display:flex;align-items:center;gap:.9rem;padding:1rem 1.2rem;background:#fafdf9;border-radius:12px;border:1.5px solid #e8eee6;transition:all .2s;color:var(--text)"
+           onmouseover="this.style.borderColor='rgba(48,77,48,.3)';this.style.background='#eef5ec'"
+           onmouseout="this.style.borderColor='#e8eee6';this.style.background='#fafdf9'">
+          <span style="font-size:1.5rem">🦷</span>
+          <div style="flex:1"><div style="font-weight:700;font-size:.9rem">كلية طب الأسنان</div><div style="font-size:.75rem;color:var(--muted)">MohammedMahdy3.html</div></div>
+        </a>
+        <a href="MohammedMahdy4.html" target="_blank" onclick="closeM('siteNavModal');addLog('view','فتح: الإدارة')"
+           style="display:flex;align-items:center;gap:.9rem;padding:1rem 1.2rem;background:#fafdf9;border-radius:12px;border:1.5px solid #e8eee6;transition:all .2s;color:var(--text)"
+           onmouseover="this.style.borderColor='rgba(48,77,48,.3)';this.style.background='#eef5ec'"
+           onmouseout="this.style.borderColor='#e8eee6';this.style.background='#fafdf9'">
+          <span style="font-size:1.5rem">📊</span>
+          <div style="flex:1"><div style="font-weight:700;font-size:.9rem">كلية الإدارة والاقتصاد</div><div style="font-size:.75rem;color:var(--muted)">MohammedMahdy4.html</div></div>
+        </a>
+      </div>
+      <div style="margin-top:1.2rem;padding:1rem;background:rgba(197,170,16,.06);border-radius:10px;border:1px solid rgba(197,170,16,.2)">
+        <p style="font-size:.78rem;color:var(--muted)">💡 ستُفتح الصفحة في تبويب جديد. بعد تسجيل الدخول، ستظهر شريط التحرير العائم في أسفل كل صفحة يتيح لك التعديل المباشر.</p>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn btn-ghost" onclick="closeM('siteNavModal')">إغلاق</button>
+      <a href="MohammedMahdy.html" target="_blank" class="btn btn-gold"
+         onclick="closeM('siteNavModal');addLog('view','فتح الموقع الرئيسي')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        فتح الموقع الرئيسي
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Notification -->
+<div class="notif" id="notif"><span id="notifIcon">✓</span><span id="notifTxt"></span></div>
+
+<script>
+'use strict';
+
+// ── Auth guard ────────────────────────────────────
+if(!sessionStorage.getItem('adminAuth')){
+  window.location.href='admin-login.html';
+}
+
+// ── Identity ──────────────────────────────────────
+const ROLE  = sessionStorage.getItem('adminRole')    || 'super';
+const UNAME = sessionStorage.getItem('adminUser')    || 'مدير النظام';
+const ULOG  = sessionStorage.getItem('adminUsername')|| 'admin';
+const ROLE_NAMES = {super:'Super Admin',dean:'عميد الكلية',editor:'محرر',viewer:'مشاهد'};
+const ROLE_CLASSES = {super:'rb-super',dean:'rb-dean',editor:'rb-editor',viewer:'rb-viewer'};
+const ROLE_COLORS  = {super:'linear-gradient(135deg,#8b5cf6,#a78bfa)',dean:'linear-gradient(135deg,#3b82f6,#60a5fa)',editor:'linear-gradient(135deg,var(--gold),var(--gold2))',viewer:'linear-gradient(135deg,#9ca3af,#d1d5db)'};
+const ROLE_TXT_CLR = {super:'#fff',dean:'#fff',editor:'var(--g900)',viewer:'#fff'};
+
+function ROLES_N(r){return ROLE_NAMES[r]||'مستخدم'}
+
+['sbAv','tbAv'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=UNAME[0]});
+['sbName','tbName'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=UNAME});
+const sbR=document.getElementById('sbRole');if(sbR)sbR.textContent=ROLES_N(ROLE);
+const tbR=document.getElementById('tbRole');if(tbR)tbR.textContent=ROLES_N(ROLE);
+const wMsg=document.getElementById('wMsg');if(wMsg)wMsg.textContent='مرحباً، '+UNAME+' 👋';
+const wDate=document.getElementById('wDate');if(wDate)wDate.textContent='اليوم: '+new Date().toLocaleDateString('ar-IQ',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+// Hide admin-only elements for non-super
+if(ROLE!=='super'){
+  ['navUsers','addUsrBtn','addColBtn'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none'});
+}
+
+// ── Data (يُحمَّل من localStorage إن وُجد) ────────
+const DEFAULT_COLLEGES = [
+  {id:1,nameAr:'علوم الحاسوب والرياضيات',nameEn:'Computer Science & Math',year:2007,status:'active',dean:'أ.د. أحمد محمد',url:'MohammedMahdy1.html',logo:'aa.png',desc:'قسم متميز في مجال الحاسوب'},
+  {id:2,nameAr:'الهندسة',nameEn:'Engineering',year:1988,status:'active',dean:'أ.د. عمر خالد',url:'MohammedMahdy2.html',logo:'bb.png',desc:'5 أقسام هندسية متخصصة'},
+  {id:3,nameAr:'طب الأسنان',nameEn:'Dentistry',year:2006,status:'active',dean:'أ.د. سارة علي',url:'MohammedMahdy3.html',logo:'cc.png',desc:''},
+  {id:4,nameAr:'الإدارة والاقتصاد',nameEn:'Administration & Economics',year:2000,status:'active',dean:'أ.د. كريم حسن',url:'MohammedMahdy4.html',logo:'dd.png',desc:''},
+];
+let colleges = (()=>{try{const s=localStorage.getItem('tikrit_colleges');return s?JSON.parse(s):DEFAULT_COLLEGES;}catch{return DEFAULT_COLLEGES;}})();
+let users = [
+  {id:1,name:'مدير النظام',username:'admin',email:'admin@tikrit.edu.iq',role:'super',status:'active',twofa:true,college:''},
+  {id:2,name:'عميد كلية الحاسوب',username:'dean.cs',email:'dean.cs@tikrit.edu.iq',role:'dean',status:'active',twofa:true,college:'cs'},
+  {id:3,name:'محرر الأخبار',username:'editor1',email:'editor@tikrit.edu.iq',role:'editor',status:'active',twofa:true,college:''},
+];
+let delTarget=null,nCol=Math.max(5,...colleges.map(c=>c.id+1)),nUsr=4;
+
+const mediaFiles=['11.jpeg','2.jpg','4.jpg','12.jpg','13.jpg','13.jpeg','ng1.jpg','ng.jpg','ng2.jpg','th2.jpg','th.jpg','dr.jpg','dr1.jpg','dr2.jpg'];
+const DEFAULT_PAGE_DATA=[
+  {name:'الصفحة الرئيسية',icon:'🏛',link:'MohammedMahdy.html',sections:[{label:'عن الجامعة',text:'جامعة تكريت من المؤسسات التعليمية سريعة التطور...',vis:true},{label:'إنجازات الجامعة',text:'تأسست بكلية واحدة وتوسعت لتضم 22 كلية...',vis:true},{label:'خدمة المجتمع',text:'نهج نوعي في خدمة المجتمع...',vis:true}]},
+  {name:'علوم الحاسوب',icon:'💻',link:'MohammedMahdy1.html',sections:[{label:'عن الكلية',text:'بدأت الكلية بقسمي علوم الحاسوب والرياضيات...',vis:true},{label:'الرسالة',text:'تسعى لرفد دوائر المحافظة...',vis:true},{label:'الهدف',text:'إعداد خريجين أكفاء...',vis:true}]},
+  {name:'الهندسة',icon:'⚙️',link:'MohammedMahdy2.html',sections:[{label:'عن الكلية',text:'بدأت بثلاثة أقسام هندسية...',vis:true},{label:'الرسالة',text:'دعم التدريسيين وتطويرهم...',vis:true}]},
+  {name:'طب الأسنان',icon:'🦷',link:'MohammedMahdy3.html',sections:[{label:'عن الكلية',text:'كلية طب الأسنان المتميزة...',vis:true},{label:'الرسالة',text:'الالتزام بالريادة والتميز...',vis:true}]},
+  {name:'الإدارة والاقتصاد',icon:'📊',link:'MohammedMahdy4.html',sections:[{label:'عن الكلية',text:'ستة أقسام للدراسات الأولية...',vis:true},{label:'الرسالة',text:'الالتزام بالأمانة العلمية...',vis:true}]},
+];
+const pageData=(()=>{try{const s=localStorage.getItem('tikrit_pageData');if(s){const p=JSON.parse(s);// دمج مع البيانات الافتراضية للحفاظ على البنية
+return DEFAULT_PAGE_DATA.map((def,i)=>p[i]?{...def,...p[i],sections:def.sections.map((ds,j)=>p[i].sections&&p[i].sections[j]?{...ds,...p[i].sections[j]}:ds)}:def);}return DEFAULT_PAGE_DATA;}catch{return DEFAULT_PAGE_DATA;}})();
+const permRows=[
+  ['عرض الصفحات','✅','✅','✅','✅'],
+  ['تعديل الرئيسية','✅','❌','❌','❌'],
+  ['تعديل صفحة كليته','✅','✅','⚡','❌'],
+  ['إضافة / حذف كلية','✅','❌','❌','❌'],
+  ['إدارة المستخدمين','✅','❌','❌','❌'],
+  ['رفع وسائط','✅','✅','✅','❌'],
+  ['سجلات التدقيق','✅','❌','❌','❌'],
+  ['الإعدادات العامة','✅','❌','❌','❌'],
+  ['إدارة API','✅','❌','❌','❌'],
+];
+
+// ── Audit log ─────────────────────────────────────
+function getLogs(){try{return JSON.parse(localStorage.getItem('auditLogs')||'[]')}catch{return[]}}
+function addLog(type,action){const l=getLogs();l.unshift({type,user:ULOG,action,time:new Date().toISOString(),ip:'192.168.1.'+Math.floor(Math.random()*200+50)});localStorage.setItem('auditLogs',JSON.stringify(l.slice(0,100)))}
+function clearLogs(){localStorage.removeItem('auditLogs');renderAudit();notify('تم مسح سجل التدقيق','success')}
+function ago(iso){const s=Math.floor((Date.now()-new Date(iso))/1000);if(s<60)return 'الآن';if(s<3600)return Math.floor(s/60)+'د';if(s<86400)return Math.floor(s/3600)+'س';return Math.floor(s/86400)+'ي'}
+
+// ── Navigation ────────────────────────────────────
+const PAGE_TITLES={dash:'لوحة المعلومات',pages:'إدارة الصفحات',colleges:'إدارة الكليات',media:'مكتبة الوسائط',users:'المستخدمون والصلاحيات',security:'الأمان وسجلات التدقيق',integrations:'التكاملات والـ APIs',scalability:'الأداء والتوسع',settings:'الإعدادات العامة'};
+let pageHistory=['dash'];
+function goP(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('on'));
+  const pg=document.getElementById('pg-'+id);if(pg)pg.classList.add('on');
+  const si=document.querySelector(`.sb-item[data-p="${id}"]`);if(si)si.classList.add('on');
+  const t=document.getElementById('tbTitle');if(t)t.textContent=PAGE_TITLES[id]||'';
+  const c=document.getElementById('tbCrumb');if(c)c.textContent='الرئيسية / '+(PAGE_TITLES[id]||'');
+  if(pageHistory[pageHistory.length-1]!==id)pageHistory.push(id);
+  if(id==='colleges')renderCols();
+  if(id==='pages')renderPSE();
+  if(id==='media')renderMedia();
+  if(id==='users'){renderUsers();renderPerms()}
+  if(id==='security')renderAudit();
+  if(id==='scalability')animBars();
+  // تحديث اسم الصفحة في شريط الإجراءات
+  const abpn = document.getElementById('abPageName');
+  if(abpn) abpn.textContent = ' — ' + (PAGE_TITLES[id]||'');
+  // تحديث زر الرجوع للموقع
+  updateSiteBackBtn(id);
+  // إغلاق الشريط الجانبي على الهاتف
+  if(window.innerWidth<=768)document.getElementById('sidebar').classList.remove('open');
+}
+document.querySelectorAll('.sb-item[data-p]').forEach(el=>el.addEventListener('click',()=>goP(el.dataset.p)));
+// ══════════════════════════════════════════════════════════
+// نظام التنقل بين لوحة الإدارة والموقع — مُصلَح بالكامل
+// ══════════════════════════════════════════════════════════
+
+// قائمة صفحات الموقع مع روابطها الصحيحة
+const SITE_PAGES = [
+  { id:'home',  url:'MohammedMahdy.html',  label:'الصفحة الرئيسية',            icon:'🏛' },
+  { id:'cs',    url:'MohammedMahdy1.html', label:'كلية علوم الحاسوب',           icon:'💻' },
+  { id:'eng',   url:'MohammedMahdy2.html', label:'كلية الهندسة',                icon:'⚙️' },
+  { id:'dent',  url:'MohammedMahdy3.html', label:'كلية طب الأسنان',             icon:'🦷' },
+  { id:'mgmt',  url:'MohammedMahdy4.html', label:'كلية الإدارة والاقتصاد',      icon:'📊' },
+];
+
+// الصفحة المرتبطة حالياً بزر "عرض الموقع"
+// تبدأ بالرئيسية وتتغير ديناميكياً
+let currentSiteUrl   = 'MohammedMahdy.html';
+let currentSiteLabel = 'الموقع الرئيسي';
+
+// تحديث زر "عرض الموقع" في الشريط العلوي والشريط الجانبي
+function setSiteTarget(url, label){
+  currentSiteUrl   = url;
+  currentSiteLabel = label;
+  // شريط الإجراءات العلوي
+  const lbl = document.getElementById('siteBackLabel');
+  const btn = document.getElementById('siteBackBtn');
+  if(lbl) lbl.textContent = label;
+  if(btn) btn.title = 'فتح: ' + label;
+  // الشريط الجانبي
+  const sbLbl = document.getElementById('sbSiteLabel');
+  const sbBtn = document.getElementById('sbSiteBtn');
+  if(sbLbl) sbLbl.textContent = label;
+  if(sbBtn) sbBtn.title = 'فتح: ' + label;
+}
+
+// استدعاء من goP لضبط الهدف تلقائياً حسب الصفحة
+function updateSiteBackBtn(pageId){
+  // صفحة الكليات → الموقع الرئيسي
+  // صفحة الإدارة → تبقى على آخر كلية فُتحت إن وجدت
+  // باقي الأقسام → الموقع الرئيسي
+  if(pageId === 'dash' || pageId === 'media' ||
+     pageId === 'users' || pageId === 'security' ||
+     pageId === 'integrations' || pageId === 'scalability' ||
+     pageId === 'settings'){
+    setSiteTarget('MohammedMahdy.html', 'الموقع الرئيسي');
+  }
+  // pages و colleges يتغيران عند النقر (عبر updateSiteBtnForPage / editCol)
+}
+
+// زر "عرض الموقع" في شريط الإجراءات — يفتح الهدف الحالي مباشرة
+function goToCurrentSite(){
+  if(!currentSiteUrl){ currentSiteUrl = 'MohammedMahdy.html'; }
+  window.open(currentSiteUrl, '_blank');
+  addLog('view', 'عرض صفحة الموقع: ' + currentSiteLabel);
+}
+
+// زر "عرض الموقع" في بطاقة الوصول السريع (لوحة المعلومات)
+// يفتح نافذة اختيار الصفحة
+function goToSite(){
+  openM('siteNavModal');
+}
+
+// رجوع: بين صفحات اللوحة الداخلية فقط
+function smartBack(){
+  if(pageHistory.length > 1){
+    pageHistory.pop();
+    goP(pageHistory[pageHistory.length-1]);
+  } else {
+    goP('dash');
+  }
+}
+
+// رجوع للداخل (بين صفحات اللوحة فقط)
+function goBack(){
+  if(pageHistory.length>1){
+    pageHistory.pop();
+    goP(pageHistory[pageHistory.length-1]);
+  } else {
+    goP('dash');
+  }
+}
+function saveAll(){
+  try {
+    // Save page content
+    localStorage.setItem('tikrit_pageData', JSON.stringify(pageData));
+    // Save colleges
+    localStorage.setItem('tikrit_colleges', JSON.stringify(colleges));
+    addLog('edit','حفظ جميع التغييرات');
+    notify('تم الحفظ بنجاح ✓ — التغييرات محفوظة','success');
+  } catch(e) {
+    notify('خطأ في الحفظ: '+e.message,'error');
+  }
+}
+function doLogout(){addLog('logout','تسجيل خروج');sessionStorage.clear();window.location.href='admin-login.html'}
+
+// ── Tabs ──────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const bar=btn.closest('.tabs');
+    bar.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    const tid=btn.dataset.t;
+    document.querySelectorAll('.tabp').forEach(p=>{p.id===tid?p.classList.add('on'):p.classList.remove('on')});
+  });
+});
+
+// ── Modals ────────────────────────────────────────
+function openM(id){document.getElementById(id).classList.add('open')}
+function closeM(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
+
+// ── Colleges ──────────────────────────────────────
+function renderCols(){
+  document.getElementById('colBadge').textContent=colleges.length;
+  document.getElementById('dashColCount').textContent=colleges.filter(c=>c.status==='active').length;
+  document.getElementById('colBody').innerHTML=colleges.map(c=>`<tr data-col-id="${c.id}">
+    <td><img src="${c.logo}" class="cthumb" onerror="this.style.opacity='.25'"></td>
+    <td><strong>${c.nameAr}</strong></td>
+    <td style="direction:ltr;text-align:right;font-size:.8rem">${c.nameEn}</td>
+    <td style="font-family:'Poppins',sans-serif">${c.year}</td>
+    <td><span class="bpill ${c.status==='active'?'bp-on':'bp-off'}">${c.status==='active'?'نشط':'مخفي'}</span></td>
+    <td style="font-size:.8rem">${c.dean||'—'}</td>
+    <td><div class="acts">
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="editCol(${c.id})" title="تعديل">✏️</button>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="togCol(${c.id})" title="تبديل الحالة">${c.status==='active'?'👁':'🚫'}</button>
+      <a href="${c.url}" target="_blank" class="btn btn-gold btn-sm" title="عرض صفحة الكلية في الموقع" style="font-size:.75rem;padding:.3rem .65rem;gap:.3rem;display:inline-flex;align-items:center">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        عرض الصفحة
+      </a>
+      ${ROLE==='super'?`<button class="btn btn-danger btn-sm btn-icon" onclick="askDel(${c.id},'col','${c.nameAr}')" title="حذف">🗑</button>`:''}
+    </div></td>
+  </tr>`).join('');
+}
+function openColModal(){
+  document.getElementById('colMTitle').textContent='إضافة كلية جديدة';
+  document.getElementById('eColId').value='';
+  ['cAr','cEn','cDe','cUrl','cDesc'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('cYr').value='';document.getElementById('cSt').value='active';
+  document.getElementById('logoPrev').style.display='none';
+  openM('colModal');
+}
+function editCol(id){
+  const c=colleges.find(x=>x.id===id);if(!c)return;
+  document.getElementById('colMTitle').textContent='تعديل بيانات الكلية';
+  document.getElementById('eColId').value=id;
+  document.getElementById('cAr').value=c.nameAr;document.getElementById('cEn').value=c.nameEn;
+  document.getElementById('cYr').value=c.year;document.getElementById('cSt').value=c.status;
+  document.getElementById('cDe').value=c.dean||'';document.getElementById('cUrl').value=c.url||'';
+  document.getElementById('cDesc').value=c.desc||'';
+  const lp=document.getElementById('logoPrev');if(c.logo){lp.src=c.logo;lp.style.display='block';}else{lp.style.display='none';}
+  // تحديث زر "عرض الموقع" ليشير لصفحة هذه الكلية تحديداً
+  if(c.url){
+    setSiteTarget(c.url, '🎓 صفحة: ' + c.nameAr);
+  }
+  openM('colModal');
+}
+function saveCol(){
+  const ar=document.getElementById('cAr').value.trim(),en=document.getElementById('cEn').value.trim();
+  if(!ar||!en){notify('الرجاء ملء الحقول الإلزامية *','error');return}
+  const eid=parseInt(document.getElementById('eColId').value);
+  const d={nameAr:ar,nameEn:en,year:parseInt(document.getElementById('cYr').value)||2024,
+    status:document.getElementById('cSt').value,dean:document.getElementById('cDe').value.trim(),
+    url:document.getElementById('cUrl').value.trim(),desc:document.getElementById('cDesc').value.trim(),
+    logo:document.getElementById('logoPrev').style.display!=='none'?document.getElementById('logoPrev').src:''};
+  if(eid){const i=colleges.findIndex(c=>c.id===eid);colleges[i]={...colleges[i],...d};addLog('edit','تعديل كلية: '+ar);}
+  else{colleges.push({id:nCol++,...d});addLog('create','إضافة كلية: '+ar);}
+  localStorage.setItem('tikrit_colleges',JSON.stringify(colleges));closeM('colModal');renderCols();notify('تم حفظ الكلية بنجاح ✓ — محفوظ','success');
+}
+function togCol(id){
+  const c=colleges.find(x=>x.id===id);if(!c)return;
+  c.status=c.status==='active'?'hidden':'active';
+  try{localStorage.setItem('tikrit_colleges',JSON.stringify(colleges));}catch(e){}
+  addLog('edit','تغيير حالة كلية: '+c.nameAr+' → '+c.status);
+  renderCols();notify(c.status==='active'?'✓ تم إظهار الكلية':'الكلية مخفية الآن','success');
+}
+function prevLogo(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{const lp=document.getElementById('logoPrev');lp.src=e.target.result;lp.style.display='block'};r.readAsDataURL(f)}
+
+// ── Users ─────────────────────────────────────────
+const COL_NAMES={cs:'الحاسوب',eng:'الهندسة',dent:'الأسنان',mgmt:'الإدارة'};
+function renderUsers(){
+  document.getElementById('usrBadge').textContent=users.length;
+  document.getElementById('dashUsrCount').textContent=users.length;
+  document.getElementById('uGrid').innerHTML=users.map(u=>`
+    <div class="ucard">
+      <div class="ucard-top">
+        <div class="uav" style="background:${ROLE_COLORS[u.role]};color:${ROLE_TXT_CLR[u.role]}">${u.name[0]}</div>
+        <div><div class="uname">${u.name}</div><div class="uemail">${u.email}</div></div>
+      </div>
+      <div class="umeta">
+        <span class="role-badge ${ROLE_CLASSES[u.role]}">${ROLES_N(u.role)}</span>
+        ${u.twofa?'<span class="bpill bp-on" style="font-size:.68rem">2FA ✓</span>':'<span class="bpill bp-off" style="font-size:.68rem">لا 2FA</span>'}
+      </div>
+      ${u.college?`<div style="font-size:.74rem;color:var(--muted)">الكلية: ${COL_NAMES[u.college]||u.college}</div>`:''}
+      ${ROLE==='super'?`<div class="uacts">
+        <button class="btn btn-ghost btn-sm" onclick="editUsr(${u.id})">✏️ تعديل</button>
+        <button class="btn btn-danger btn-sm" onclick="askDel(${u.id},'usr','${u.name}')">🗑 حذف</button>
+      </div>`:''}
+    </div>`).join('');
+}
+function renderPerms(){
+  document.getElementById('pmBody').innerHTML=permRows.map(row=>`<tr>
+    <td>${row[0]}</td>
+    ${row.slice(1).map(v=>`<td>${v==='✅'?'<span class="chk">✅</span>':v==='❌'?'<span class="crs">—</span>':`<span class="par">${v}</span>`}</td>`).join('')}
+  </tr>`).join('');
+}
+function openUsrModal(){
+  document.getElementById('usrMTitle').textContent='إضافة مستخدم جديد';
+  document.getElementById('eUsrId').value='';
+  ['uNm','uUn','uEm','uPw'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('uRo').value='editor';chkColField();openM('usrModal');
+}
+function editUsr(id){
+  const u=users.find(x=>x.id===id);if(!u)return;
+  document.getElementById('usrMTitle').textContent='تعديل المستخدم';
+  document.getElementById('eUsrId').value=id;
+  document.getElementById('uNm').value=u.name;document.getElementById('uUn').value=u.username;
+  document.getElementById('uEm').value=u.email;document.getElementById('uPw').value='';
+  document.getElementById('uRo').value=u.role;document.getElementById('uCo').value=u.college||'';
+  chkColField();openM('usrModal');
+}
+function saveUsr(){
+  const nm=document.getElementById('uNm').value.trim(),un=document.getElementById('uUn').value.trim(),em=document.getElementById('uEm').value.trim();
+  if(!nm||!un||!em){notify('الرجاء ملء الحقول الإلزامية','error');return}
+  const eid=parseInt(document.getElementById('eUsrId').value);
+  const d={name:nm,username:un,email:em,role:document.getElementById('uRo').value,college:document.getElementById('uCo').value,twofa:true,status:'active'};
+  if(eid){const i=users.findIndex(u=>u.id===eid);users[i]={...users[i],...d};addLog('edit','تعديل مستخدم: '+nm);}
+  else{users.push({id:nUsr++,...d});addLog('create','إضافة مستخدم: '+nm);}
+  try{localStorage.setItem('tikrit_users',JSON.stringify(users));}catch(e){}
+  closeM('usrModal');renderUsers();notify('تم حفظ المستخدم ✓','success');
+}
+function chkColField(){const r=document.getElementById('uRo').value;document.getElementById('colField').style.display=r==='dean'?'flex':'none'}
+
+// ── Delete ────────────────────────────────────────
+function askDel(id,type,name){delTarget={id,type};document.getElementById('delMsg').textContent='هل تريد حذف: '+name+'؟';openM('delModal')}
+function confDel(){
+  if(!delTarget)return;
+  if(delTarget.type==='col'){const c=colleges.find(x=>x.id===delTarget.id);addLog('delete','حذف كلية: '+(c?.nameAr||''));colleges=colleges.filter(x=>x.id!==delTarget.id);localStorage.setItem('tikrit_colleges',JSON.stringify(colleges));renderCols();}
+  else{const u=users.find(x=>x.id===delTarget.id);addLog('delete','حذف مستخدم: '+(u?.name||''));users=users.filter(x=>x.id!==delTarget.id);localStorage.setItem('tikrit_users',JSON.stringify(users));renderUsers();}
+  closeM('delModal');notify('تم الحذف','success');
+}
+
+// ── Page editor ───────────────────────────────────
+function renderPSE(){
+  document.getElementById('pseList').innerHTML=pageData.map((p,pi)=>`
+    <div class="pse" id="pse${pi}">
+      <div class="pse-hdr" onclick="document.getElementById('pse${pi}').classList.toggle('open');updateSiteBtnForPage(${pi})">
+        <span style="font-size:1.1rem">${p.icon}</span>
+        <h4>${p.name}</h4>
+        <a href="${p.link}" target="_blank"
+           class="btn btn-gold btn-sm"
+           style="font-size:.74rem;padding:.3rem .7rem;display:inline-flex;align-items:center;gap:.3rem"
+           onclick="event.stopPropagation()"
+           title="فتح الصفحة في الموقع">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          عرض الصفحة
+        </a>
+        <span class="bpill bp-on" style="margin-right:.4rem;font-size:.7rem">${p.sections.filter(s=>s.vis).length}/${p.sections.length}</span>
+        <span class="pse-caret">▼</span>
+      </div>
+      <div class="pse-body">${p.sections.map((s,si)=>`
+        <div class="sec-block ${s.vis?'':'hidden-sec'}">
+          <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.6rem;flex-wrap:wrap">
+            <strong style="flex:1;font-size:.85rem;color:var(--g700)">${s.label}</strong>
+            <label class="tog-wrap" style="margin:0;cursor:pointer">
+              <div class="tog ${s.vis?'on':''}" id="stog${pi}_${si}" onclick="togSec(${pi},${si})"></div>
+              <span style="font-size:.73rem;color:var(--muted)">${s.vis?'ظاهر':'مخفي'}</span>
+            </label>
+          </div>
+          <textarea id="stxt${pi}_${si}" rows="3" style="width:100%;padding:.58rem .8rem;border:1.5px solid #dde8da;border-radius:8px;font-family:inherit;font-size:.82rem;resize:vertical;outline:none">${s.text}</textarea>
+          <div style="display:flex;justify-content:flex-end;margin-top:.45rem">
+            <button class="btn btn-primary btn-sm" onclick="saveSec(${pi},${si})">✓ حفظ</button>
+          </div>
+        </div>`).join('')}</div>
+    </div>`).join('');
+}
+function togSec(pi,si){
+  pageData[pi].sections[si].vis=!pageData[pi].sections[si].vis;
+  try{localStorage.setItem('tikrit_pageData',JSON.stringify(pageData));}catch(e){}
+  renderPSE();
+  notify(pageData[pi].sections[si].vis?'✓ القسم ظاهر الآن':'القسم مخفي الآن','success');
+}
+function saveSec(pi,si){
+  pageData[pi].sections[si].text=document.getElementById(`stxt${pi}_${si}`).value;
+  localStorage.setItem('tikrit_pageData',JSON.stringify(pageData));
+  addLog('edit','تعديل: '+pageData[pi].sections[si].label);
+  notify('تم الحفظ ✓ — محفوظ','success');
+}
+
+// ── Media ─────────────────────────────────────────
+function renderMedia(){
+  document.getElementById('mGrid').innerHTML=mediaFiles.map(f=>`
+    <div class="mcell">
+      <img src="${f}" alt="${f}" onclick="openLB('${f}')" onerror="this.parentElement.style.display='none'">
+      <div class="mcell-name">${f}</div>
+    </div>`).join('');
+}
+function handleUpload(input){
+  Array.from(input.files).forEach(f=>mediaFiles.unshift(f.name));
+  renderMedia();addLog('upload','رفع '+input.files.length+' ملف(ات)');
+  notify('تم رفع الملفات ✓','success');input.value='';
+}
+
+// ── Audit render ──────────────────────────────────
+function renderAudit(){
+  const logs=getLogs();
+  const fc=document.getElementById('failCnt');if(fc)fc.textContent=logs.filter(l=>l.type.includes('fail')).length;
+  const tmap={login:'al-login',login_fail:'al-delete',edit:'al-edit',create:'al-create',delete:'al-delete',upload:'al-upload',logout:'al-logout'};
+  const nd=document.getElementById('notifDot');if(nd)nd.style.display=logs.filter(l=>l.type.includes('fail')).length?'block':'none';
+  document.getElementById('aBody').innerHTML=logs.length
+    ?logs.map(l=>`<tr>
+        <td style="font-weight:700;font-size:.84rem">${l.user}</td>
+        <td><span class="al-type ${tmap[l.type]||'al-edit'}">${l.type}</span></td>
+        <td style="font-size:.8rem;color:var(--muted)">${l.action}</td>
+        <td style="direction:ltr;text-align:right;font-family:monospace;font-size:.73rem;color:var(--muted)">${l.ip}</td>
+        <td style="font-size:.73rem;color:var(--muted);white-space:nowrap">${ago(l.time)}</td>
+      </tr>`).join('')
+    :`<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--muted)">لا توجد سجلات بعد</td></tr>`;
+}
+
+// ── Dashboard activity ─────────────────────────────
+function renderDashAct(){
+  const logs=getLogs().slice(0,5);
+  const defs=[
+    {type:'login',action:'تسجيل دخول ناجح',time:new Date(Date.now()-7200000).toISOString()},
+    {type:'edit',action:'تعديل صفحة كلية الحاسوب',time:new Date(Date.now()-86400000).toISOString()},
+    {type:'create',action:'إضافة كلية جديدة',time:new Date(Date.now()-172800000).toISOString()},
+  ];
+  const items=[...logs,...defs].slice(0,5);
+  const icons={login:'🟢',login_fail:'🔴',edit:'🔵',create:'🟡',delete:'🔴',upload:'🟣',logout:'⚪'};
+  const el=document.getElementById('dashAct');
+  if(el)el.innerHTML=`<div style="display:flex;flex-direction:column;gap:.55rem">
+    ${items.map(l=>`<div style="display:flex;align-items:center;gap:.7rem;padding:.58rem .8rem;background:#f5f7f4;border-radius:9px">
+      <span>${icons[l.type]||'⚪'}</span>
+      <span style="font-size:.82rem;flex:1;color:var(--text)">${l.action}</span>
+      <span style="font-size:.72rem;color:var(--muted);white-space:nowrap">${ago(l.time)}</span>
+    </div>`).join('')}
+  </div>`;
+}
+
+// ── Rings & Bars ──────────────────────────────────
+function setRing(id,pct){const c=239;const el=document.getElementById(id);if(el)el.style.strokeDasharray=`${c*pct/100} ${c}`}
+function animRings(){setTimeout(()=>{setRing('r1',32);const v1=document.getElementById('rv1');if(v1)v1.textContent='32%';setRing('r2',58);const v2=document.getElementById('rv2');if(v2)v2.textContent='58%';setRing('r3',28);const v3=document.getElementById('rv3');if(v3)v3.textContent='14';},500)}
+function animBars(){setTimeout(()=>{[[1,32,'%'],[2,58,'%'],[3,15,'%'],[4,44,'%']].forEach(([n,v,s])=>{const pb=document.getElementById('pb'+n),pv=document.getElementById('pv'+n);if(pb)pb.style.width=v+'%';if(pv)pv.textContent=v+s;});},400)}
+function animCounters(){document.querySelectorAll('.snum[data-c]').forEach(el=>{const t=parseInt(el.dataset.c)||0;let n=0,step=Math.max(1,Math.ceil(t/20));const iv=setInterval(()=>{n=Math.min(n+step,t);el.textContent=n;if(n>=t)clearInterval(iv)},50)})}
+
+// ── Lightbox ──────────────────────────────────────
+function openLB(src){const lb=document.getElementById('lb');const li=document.getElementById('lbImg');li.src=src;lb.classList.add('open');document.body.style.overflow='hidden'}
+function closeLB(){document.getElementById('lb').classList.remove('open');document.body.style.overflow=''}
+document.getElementById('lb').addEventListener('click',e=>{if(e.target===document.getElementById('lb'))closeLB()})
+
+// ── Notification ──────────────────────────────────
+let notifTimer=null;
+function notify(msg,type='success'){
+  const n=document.getElementById('notif');
+  const ni=document.getElementById('notifIcon');
+  const nt=document.getElementById('notifTxt');
+  if(!n||!ni||!nt)return;
+  ni.textContent=type==='success'?'✓':'✕';
+  nt.textContent=msg;
+  n.className=`notif show ${type}`;
+  if(notifTimer)clearTimeout(notifTimer);
+  notifTimer=setTimeout(()=>n.classList.remove('show'),3200);
+}
+
+// تحديث زر "عرض الموقع" عند فتح قسم في محرر الصفحات
+function updateSiteBtnForPage(pi){
+  if(pi >= 0 && pi < pageData.length){
+    const p = pageData[pi];
+    setSiteTarget(p.link, p.icon + ' ' + p.name);
+  }
+}
+
+// ── Keyboard shortcuts ───────────────────────────
+document.addEventListener('keydown', e => {
+  if((e.ctrlKey||e.metaKey) && e.key==='s'){ e.preventDefault(); saveAll(); }
+  if((e.ctrlKey||e.metaKey) && e.key==='ArrowRight'){ e.preventDefault(); goBack(); }
+});
+
+// ── Init + URL params ────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  // تهيئة لوحة المعلومات
+  renderCols();   // تحديث عداد الكليات
+  animCounters(); animRings(); animBars(); renderDashAct(); renderAudit();
+  if(getLogs().length===0) addLog('login','تسجيل دخول ناجح');
+  // Handle ?page=xxx&pi=N from public pages edit buttons
+  const params = new URLSearchParams(window.location.search);
+  const tPage = params.get('page');
+  const tPi   = parseInt(params.get('pi'));
+  if(tPage) {
+    goP(tPage);
+    if(tPage==='pages' && !isNaN(tPi)) {
+      setTimeout(()=>{
+        // Render PSE first then open the right accordion
+        const el = document.getElementById('pse'+tPi);
+        if(el){ el.classList.add('open'); el.scrollIntoView({behavior:'smooth',block:'start'}); }
+      }, 400);
+    }
+    if(tPage==='colleges' && !isNaN(tPi)) {
+      // Scroll to college row
+      setTimeout(()=>{
+        const row = document.querySelector(`[data-col-id="${tPi}"]`);
+        if(row) row.scrollIntoView({behavior:'smooth',block:'center'});
+      }, 400);
+    }
+  }
+  // Clean URL without reload
+  if(tPage) window.history.replaceState({},'',window.location.pathname);
+});
+</script>
+</body>
+</html>

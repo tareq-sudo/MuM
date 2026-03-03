@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Tikrit University - Administration & Economics</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body dir="ltr">
+  <header class="site-header">
+    <div class="header-inner">
+      <img src="1.png" alt="Tikrit University" class="header-logo">
+      <h1 class="header-title">TIKRIT UNIVERSITY</h1>
+      <p class="header-subtitle">Tikrit University · Saladin Governorate</p>
+    </div>
+  </header>
+  <nav class="navbar">
+    <div class="nav-links">
+      <a href="mohammed.html" class="nav-link">🏛 Home</a>
+      <a href="mohammed1.html" class="nav-link">💻 Computing</a>
+      <a href="mohammed2.html" class="nav-link">⚙️ Engineering</a>
+      <a href="mohammed3.html" class="nav-link">🦷 Dentistry</a>
+      <a href="mohammed4.html" class="nav-link active">📊 Management</a>
+    </div>
+    <div class="nav-right">
+      <button class="lang-btn" onclick="window.location.href='MohammedMahdy4.html'">
+        <img src="ar.png" alt=""> عربي
+      </button>
+      <a href="admin-login.html" class="admin-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg> Admin</a>
+    </div>
+  </nav>
+  <main class="container">
+
+    <img src="dd.png" alt="" class="college-icon" data-animate>
+
+    <div class="content-card clearfix" data-animate data-delay="1">
+      <h2 class="section-title">About the College</h2>
+      <div class="info-box">
+        <h2>Administration & Economics</h2>
+        <p>Founded in 2000, initially with Business Administration and Economics departments.</p>
+      </div>
+      <p class="section-text">Currently comprises six undergraduate departments and nine graduate programs including Ph.D. and Master's degrees across all management and economics specializations.</p>
+    </div>
+
+    <div class="content-card" data-animate data-delay="2">
+      
+      <div class="section-block" data-animate>
+        <h3 class="sub-heading">Mission</h3>
+        <p class="section-text">Committed to scientific integrity and preparing competent graduates. Supporting all state institutions and the private sector through the consulting center.</p>
+        <img src="dr2.jpg" alt="" class="single-img">
+      </div>
+      <div class="section-block" data-animate>
+        <h3 class="sub-heading">Goals</h3>
+        <p class="section-text">Adhering to official academic standards. Preparing students academically throughout their studies. Maintaining scientific quality standards and continuously updating curricula.</p>
+        <img src="dr1.jpg" alt="" class="single-img">
+      </div>
+      <div class="section-block" data-animate>
+        <h3 class="sub-heading">Vision</h3>
+        <p class="section-text">Excellence in performance to attain a distinguished standing among peer colleges and conducting impactful research in partnership with societal institutions.</p>
+        <img src="dr.jpg" alt="" class="single-img">
+      </div>
+      
+    </div>
+  </main>
+  <footer class="footer-nav">
+    <div class="footer-inner">
+      <p class="footer-copy">© 2024 Tikrit University — Saladin Governorate, Iraq</p>
+      <a href="admin-login.html" class="footer-admin">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        دخول الإدارة
+      </a>
+    </div>
+  </footer>
+
+  <div id="lightbox" class="lightbox">
+    <span class="lb-close">✕</span>
+    <img id="lb-img" src="" alt="">
+  </div>
+  <button id="backToTop" class="back-top" aria-label="Back to top">↑</button>
+
+<script>
+  // ── Scroll reveal ─────────────────────────────────
+  const revealObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting){e.target.classList.add('visible');revealObs.unobserve(e.target)} });
+  }, {threshold:0.1});
+  document.querySelectorAll('[data-animate]').forEach(el => revealObs.observe(el));
+
+  // ── Navbar scroll hide/show + scrolled class ──────
+  let lastY = 0;
+  const navbar = document.querySelector('.navbar');
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    navbar.classList.toggle('hidden', y > 100 && y > lastY);
+    navbar.classList.toggle('scrolled', y > 60);
+    document.getElementById('backToTop').classList.toggle('show', y > 320);
+    lastY = y;
+  }, {passive:true});
+
+  // ── Back to top ───────────────────────────────────
+  document.getElementById('backToTop').addEventListener('click', () =>
+    window.scrollTo({top:0,behavior:'smooth'})
+  );
+
+  // ── Lightbox ──────────────────────────────────────
+  const lb = document.getElementById('lightbox');
+  const lbI = document.getElementById('lb-img');
+  document.querySelectorAll('.gallery-img, .single-img').forEach(img => {
+    img.addEventListener('click', () => { lbI.src = img.src; lb.classList.add('open'); document.body.style.overflow='hidden'; });
+  });
+  lb.addEventListener('click', () => { lb.classList.remove('open'); document.body.style.overflow=''; });
+
+  // ── College icon subtle parallax ─────────────────
+  const ci = document.querySelector('.college-icon');
+  if(ci) window.addEventListener('scroll', () => {
+    ci.style.transform = `translateY(${window.scrollY * 0.06}px)`;
+  }, {passive:true});
+
+  // ── Stat counter animation ────────────────────────
+  document.querySelectorAll('.stat-num[data-count]').forEach(el => {
+    const target = parseInt(el.dataset.count);
+    const obs = new IntersectionObserver(entries => {
+      if(entries[0].isIntersecting) {
+        let n = 0, step = Math.ceil(target/40);
+        const t = setInterval(() => {
+          n = Math.min(n+step, target);
+          el.textContent = n + (el.dataset.suffix||'');
+          if(n >= target) clearInterval(t);
+        }, 35);
+        obs.unobserve(el);
+      }
+    });
+    obs.observe(el);
+  });
+</script>
+
+
+
+<!-- ══ ADMIN EDIT BAR ══ -->
+<style>
+#adminBar{
+  display:none;
+  position:fixed;
+  bottom:1.4rem;
+  left:50%;
+  transform:translateX(-50%);
+  background:linear-gradient(135deg,#0d1f14,#1e4028);
+  border:1.5px solid rgba(197,170,16,.4);
+  border-radius:50px;
+  padding:.55rem 1.1rem;
+  box-shadow:0 8px 40px rgba(13,31,20,.6);
+  align-items:center;
+  gap:.7rem;
+  z-index:9999;
+  animation:adminBarDrop .5s cubic-bezier(.34,1.56,.64,1) both;
+  white-space:nowrap;
+  font-family:'Cairo','Poppins',sans-serif;
+  max-width:96vw;
+  overflow:hidden;
+}
+#adminBar.visible{display:flex}
+@keyframes adminBarDrop{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.ab-tag{color:rgba(238,245,236,.45);font-size:.72rem;font-weight:600}
+.ab-sep{width:1px;height:18px;background:rgba(197,170,16,.3);flex-shrink:0}
+.ab-link-main{
+  display:inline-flex;align-items:center;gap:.35rem;
+  color:#e8c940;font-size:.8rem;font-weight:700;
+  padding:.32rem .75rem;border-radius:50px;
+  background:rgba(197,170,16,.15);border:1px solid rgba(197,170,16,.3);
+  text-decoration:none;transition:all .2s;white-space:nowrap;
+}
+.ab-link-main:hover{background:rgba(197,170,16,.28)}
+.ab-link{
+  display:inline-flex;align-items:center;gap:.3rem;
+  color:rgba(238,245,236,.72);font-size:.78rem;
+  padding:.3rem .6rem;border-radius:50px;
+  text-decoration:none;transition:all .2s;white-space:nowrap;
+}
+.ab-link:hover{color:#e8c940;background:rgba(255,255,255,.06)}
+.ab-close{
+  color:rgba(238,245,236,.4);font-size:.78rem;
+  padding:.3rem .6rem;border-radius:50px;
+  border:1px solid rgba(255,255,255,.12);
+  cursor:pointer;background:none;
+  font-family:inherit;transition:all .2s;
+}
+.ab-close:hover{color:#ff8080;border-color:rgba(255,80,80,.35)}
+</style>
+
+<div id="adminBar">
+  <span class="ab-tag">Edit Mode</span>
+  <div class="ab-sep"></div>
+  <a href="admin-dashboard.html?page=pages&pi=4" class="ab-link-main">
+    ✏️ Edit This Page
+  </a>
+  <a href="admin-dashboard.html?page=colleges" class="ab-link">🎓 Colleges</a>
+  <a href="admin-dashboard.html" class="ab-link">🏠 Dashboard</a>
+  <div class="ab-sep"></div>
+  <button class="ab-close" onclick="exitAdminMode()">✕ Close</button>
+</div>
+
+<script>
+(function(){
+  if(sessionStorage.getItem('adminAuth')==='1'){
+    document.getElementById('adminBar').classList.add('visible');
+  }
+})();
+function exitAdminMode(){
+  sessionStorage.clear();
+  document.getElementById('adminBar').classList.remove('visible');
+}
+</script>
+
+<script>
+// ── Sync content with admin dashboard ──────────────
+(function(){
+  try {
+    const savedPages    = JSON.parse(localStorage.getItem('tikrit_pageData') || 'null');
+    const savedColleges = JSON.parse(localStorage.getItem('tikrit_colleges') || 'null');
+    if(savedPages && savedPages[4]) {
+      const pageInfo = savedPages[4];
+      pageInfo.sections.forEach((sec, si) => {
+        const blocks = document.querySelectorAll('[data-sec="' + si + '"]');
+        blocks.forEach(b => b.style.display = sec.vis ? '' : 'none');
+        const textEl = document.querySelector('[data-sec-text="' + si + '"]');
+        if(textEl && sec.text) textEl.textContent = sec.text;
+      });
+    }
+    if(savedColleges && 4 === 0) {
+      const grid = document.querySelector('.colleges-grid');
+      if(grid) {
+        const cards = grid.querySelectorAll('.college-card');
+        savedColleges.forEach((col, i) => {
+          if(cards[i]) {
+            cards[i].style.display = col.status === 'active' ? '' : 'none';
+            const img = cards[i].querySelector('img');
+            if(img && col.logo) img.src = col.logo;
+          }
+        });
+      }
+    }
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>بوابة الإدارة — جامعة تكريت</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body{margin:0;overflow:hidden;background:var(--g900)}
+.lp{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;
+  background:linear-gradient(145deg,#0d1f14 0%,#1e4028 50%,#0d1f14 100%);position:relative}
+canvas{position:fixed;inset:0;pointer-events:none;z-index:0}
+.lcard{position:relative;z-index:1;background:rgba(255,255,255,.07);backdrop-filter:blur(22px);
+  border:1px solid rgba(197,170,16,.22);border-radius:24px;padding:2.8rem 2.5rem;
+  width:100%;max-width:420px;box-shadow:0 24px 80px rgba(0,0,0,.6);animation:popIn .5s cubic-bezier(.34,1.56,.64,1) both}
+.step{display:none}.step.active{display:block;animation:fadeUp .3s ease}
+.lock{width:66px;height:66px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));
+  display:flex;align-items:center;justify-content:center;margin:0 auto 1.1rem;font-size:1.8rem;
+  box-shadow:0 8px 24px rgba(197,170,16,.4)}
+.ltitle{color:var(--gold);font-size:1.35rem;font-weight:800;letter-spacing:2px;text-align:center;font-family:'Poppins','Cairo',sans-serif}
+.lsub{color:rgba(238,245,236,.45);font-size:.8rem;text-align:center;margin-top:.3rem}
+.ldiv{height:1px;background:rgba(197,170,16,.15);margin:1.3rem 0}
+.sdots{display:flex;align-items:center;justify-content:center;gap:.4rem;margin-bottom:1.3rem}
+.sdot{width:8px;height:8px;border-radius:50%;background:rgba(197,170,16,.22);transition:all .3s}
+.sdot.on{background:var(--gold);width:24px;border-radius:50px}.sdot.done{background:rgba(34,197,94,.6)}
+.lf{margin-bottom:1.1rem}
+.lf label{display:block;color:rgba(238,245,236,.68);font-size:.83rem;font-weight:600;margin-bottom:.45rem}
+.lf input{width:100%;padding:.76rem 1rem;background:rgba(255,255,255,.09);border:1.5px solid rgba(197,170,16,.2);
+  border-radius:10px;color:#eef5ec;font-family:'Cairo','Poppins',sans-serif;font-size:.93rem;outline:none;
+  transition:border-color .2s,background .2s;box-sizing:border-box}
+.lf input:focus{border-color:var(--gold);background:rgba(255,255,255,.13)}
+.lf input::placeholder{color:rgba(238,245,236,.28)}
+.pfield{position:relative}.pfield input{padding-left:2.6rem}
+.peye{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;
+  color:rgba(238,245,236,.4);cursor:pointer;font-size:1rem;transition:color .2s}
+.peye:hover{color:var(--gold2)}
+.lbtn{width:100%;padding:.86rem;border-radius:12px;background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:var(--g900);font-weight:800;font-size:.98rem;font-family:'Cairo','Poppins',sans-serif;
+  border:none;cursor:pointer;transition:all .22s;box-shadow:0 4px 18px rgba(197,170,16,.38)}
+.lbtn:hover{transform:translateY(-2px);box-shadow:0 6px 26px rgba(197,170,16,.52)}
+.lbtn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.lerr{background:rgba(239,68,68,.13);border:1px solid rgba(239,68,68,.35);border-radius:8px;
+  padding:.65rem .9rem;color:#fca5a5;font-size:.82rem;margin-bottom:.9rem;display:none}
+.lerr.show{display:block}
+.lwarn{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.28);border-radius:8px;
+  padding:.6rem .9rem;color:#fde68a;font-size:.78rem;margin-bottom:.9rem;display:none}
+.lwarn.show{display:block}
+.otp-row{display:flex;gap:.55rem;justify-content:center;margin:1rem 0}
+.obox{width:46px;height:54px;border:2px solid rgba(197,170,16,.22);border-radius:10px;
+  text-align:center;font-size:1.35rem;font-weight:800;font-family:'Poppins',sans-serif;color:#eef5ec;
+  background:rgba(255,255,255,.07);outline:none;transition:border-color .2s}
+.obox:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(197,170,16,.15)}
+.lback{display:block;text-align:center;margin-top:1.2rem;color:rgba(238,245,236,.35);font-size:.8rem;
+  background:none;border:none;cursor:pointer;font-family:'Cairo',sans-serif;transition:color .2s}
+.lback:hover{color:var(--gold2)}
+.ssl-tag{display:flex;align-items:center;gap:.4rem;justify-content:center;margin-top:1.2rem;
+  color:rgba(34,197,94,.6);font-size:.73rem}
+.back-site{
+  position:absolute;top:1.4rem;right:1.4rem;
+  display:inline-flex;align-items:center;gap:.45rem;
+  color:rgba(238,245,236,.4);font-size:.8rem;font-weight:600;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(197,170,16,.18);
+  border-radius:50px;padding:.42rem .95rem;
+  text-decoration:none;
+  transition:all .25s;z-index:10;
+}
+.back-site:hover{
+  color:var(--gold2);
+  background:rgba(197,170,16,.1);
+  border-color:rgba(197,170,16,.38);
+  transform:translateX(3px);
+}
+.back-site svg{transition:transform .25s}
+.back-site:hover svg{transform:translateX(3px)}
+.demo-box{background:rgba(197,170,16,.08);border:1px dashed rgba(197,170,16,.25);border-radius:8px;
+  padding:.7rem .9rem;margin-bottom:1rem;font-size:.76rem;color:rgba(238,245,236,.55)}
+.demo-box strong{color:var(--gold2)}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div class="lp">
+<div class="lcard">
+  <!-- زر الرجوع للموقع الرئيسي -->
+  <a href="MohammedMahdy.html" class="back-site" title="العودة للموقع الرئيسي">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    الموقع الرئيسي
+  </a>
+
+  <div class="lock" id="lockIcon">🔐</div>
+  <div class="ltitle">TIKRIT UNIVERSITY</div>
+  <div class="lsub" id="stepLabel">بوابة الإدارة الآمنة</div>
+  <div class="ldiv"></div>
+
+  <div class="sdots">
+    <div class="sdot on" id="d1"></div>
+    <div class="sdot" id="d2"></div>
+    <div class="sdot" id="d3"></div>
+  </div>
+
+  <div class="lwarn" id="warnBox"></div>
+  <div class="lerr" id="errBox"></div>
+
+  <!-- Step 1: Login -->
+  <div class="step active" id="s1">
+    <div class="demo-box">
+      بيانات تجريبية:<br>
+      <strong>admin</strong> / <strong>tikrit2024</strong> — Super Admin<br>
+      <strong>dean.cs</strong> / <strong>cs2024</strong> — عميد الحاسوب<br>
+      <strong>editor1</strong> / <strong>edit2024</strong> — محرر
+    </div>
+    <div class="lf">
+      <label>اسم المستخدم</label>
+      <input type="text" id="fu" placeholder="أدخل اسم المستخدم" autocomplete="username">
+    </div>
+    <div class="lf">
+      <label>كلمة المرور</label>
+      <div class="pfield">
+        <input type="password" id="fp" placeholder="••••••••" autocomplete="current-password">
+        <button class="peye" onclick="togglePass()" type="button" id="eyeBtn">👁</button>
+      </div>
+    </div>
+    <button class="lbtn" id="btn1" onclick="doStep1()">المتابعة ←</button>
+  </div>
+
+  <!-- Step 2: 2FA -->
+  <div class="step" id="s2">
+    <p style="color:rgba(238,245,236,.72);font-size:.86rem;text-align:center;margin-bottom:.8rem">
+      رمز التحقق المكون من 6 أرقام<br>
+      <span style="color:rgba(197,170,16,.75);font-size:.76rem">الرمز التجريبي: <strong style="color:var(--gold2)">123456</strong></span>
+    </p>
+    <div class="otp-row" id="otpRow"></div>
+    <button class="lbtn" id="btn2" onclick="doStep2()">تحقق وادخل ←</button>
+    <button class="lback" onclick="goStep(1)">← رجوع</button>
+  </div>
+
+  <!-- Step 3: Success -->
+  <div class="step" id="s3">
+    <div style="text-align:center;padding:1rem 0">
+      <div style="font-size:3rem;margin-bottom:.8rem">✅</div>
+      <p style="color:rgba(238,245,236,.88);font-weight:700;font-size:1rem">تم التحقق بنجاح!</p>
+      <p style="color:rgba(238,245,236,.42);font-size:.82rem;margin-top:.4rem">جارٍ تحميل لوحة التحكم...</p>
+      <div style="margin-top:1.3rem;background:rgba(197,170,16,.12);border-radius:50px;height:5px;overflow:hidden">
+        <div id="progBar" style="height:100%;background:var(--gold);width:0;transition:width 1.6s ease;border-radius:50px"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ssl-tag">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+    اتصال مشفر SSL — محمي بـ 2FA
+  </div>
+</div>
+</div>
+
+<script>
+// Particle canvas
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+let W,H,pts=[];
+function rsz(){W=cv.width=innerWidth;H=cv.height=innerHeight}rsz();addEventListener('resize',rsz);
+for(let i=0;i<50;i++)pts.push({x:Math.random()*1920,y:Math.random()*1080,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:Math.random()*1.6+.4,a:Math.random()});
+function draw(){ctx.clearRect(0,0,W,H);pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(197,170,16,${p.a*.3})`;ctx.fill()});pts.forEach((p,i)=>pts.slice(i+1).forEach(q=>{const d=Math.hypot(p.x-q.x,p.y-q.y);if(d<110){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.strokeStyle=`rgba(197,170,16,${(1-d/110)*.07})`;ctx.stroke()}}));requestAnimationFrame(draw)}draw();
+
+// OTP inputs
+const oRow=document.getElementById('otpRow');
+for(let i=0;i<6;i++){const b=document.createElement('input');b.className='obox';b.maxLength=1;b.inputMode='numeric';b.dataset.i=i;b.addEventListener('input',e=>{if(e.target.value&&i<5)oRow.children[i+1].focus()});b.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!e.target.value&&i>0)oRow.children[i-1].focus()});oRow.appendChild(b)}
+
+// Accounts
+const ACCS={'admin':{pass:'tikrit2024',role:'super',name:'مدير النظام'},'dean.cs':{pass:'cs2024',role:'dean',name:'عميد الحاسوب',college:'cs'},'editor1':{pass:'edit2024',role:'editor',name:'محرر الأخبار'}};
+let attempts=0,curUser=null;
+
+function goStep(n){
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s'+n).classList.add('active');
+  ['d1','d2','d3'].forEach((id,i)=>{const d=document.getElementById(id);d.className='sdot'+(i+1<n?' done':i+1===n?' on':'')});
+  const labels={1:'بوابة الإدارة الآمنة',2:'التحقق بخطوتين (2FA)',3:'تم التحقق!'};
+  document.getElementById('stepLabel').textContent=labels[n]||'';
+  document.getElementById('errBox').classList.remove('show');
+}
+function showErr(m){const e=document.getElementById('errBox');e.textContent='❌ '+m;e.classList.add('show')}
+function togglePass(){const p=document.getElementById('fp');p.type=p.type==='password'?'text':'password'}
+function setLoading(btn,on){document.getElementById(btn).disabled=on;document.getElementById(btn).textContent=on?'...جارٍ التحقق':btn==='btn1'?'المتابعة ←':'تحقق وادخل ←'}
+
+function doStep1(){
+  const u=document.getElementById('fu').value.trim(),p=document.getElementById('fp').value;
+  if(!u||!p){showErr('الرجاء ملء جميع الحقول');return}
+  setLoading('btn1',true);
+  setTimeout(()=>{
+    setLoading('btn1',false);
+    if(ACCS[u]&&ACCS[u].pass===p){curUser={username:u,...ACCS[u]};goStep(2)}
+    else{
+      attempts++;
+      if(attempts>=3){const w=document.getElementById('warnBox');w.style.display='block';w.className='lwarn show';w.textContent=`⚠️ ${attempts} محاولات فاشلة. سيُقفل الحساب بعد ${5-attempts} محاولات`}
+      showErr('اسم المستخدم أو كلمة المرور غير صحيحة')
+    }
+  },700)
+}
+
+function doStep2(){
+  const otp=[...oRow.children].map(b=>b.value).join('');
+  if(otp.length<6){showErr('أدخل الرمز المكون من 6 أرقام');return}
+  setLoading('btn2',true);
+  setTimeout(()=>{
+    if(otp==='123456'){
+      goStep(3);
+      setTimeout(()=>{document.getElementById('progBar').style.width='100%'},50);
+      // Store auth
+      sessionStorage.setItem('adminAuth','1');
+      sessionStorage.setItem('adminUser',curUser.name);
+      sessionStorage.setItem('adminRole',curUser.role);
+      sessionStorage.setItem('adminUsername',curUser.username);
+      if(curUser.college)sessionStorage.setItem('adminCollege',curUser.college);
+      // Add audit log
+      const logs=JSON.parse(localStorage.getItem('auditLogs')||'[]');
+      logs.unshift({type:'login',user:curUser.username,action:'تسجيل دخول ناجح بـ 2FA',time:new Date().toISOString(),ip:'192.168.1.'+Math.floor(Math.random()*200+50)});
+      localStorage.setItem('auditLogs',JSON.stringify(logs.slice(0,100)));
+      setTimeout(()=>{window.location.href='admin-dashboard.html'},1900)
+    }else{setLoading('btn2',false);showErr('رمز التحقق غير صحيح')}
+  },650)
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    if(document.getElementById('s1').classList.contains('active'))doStep1();
+    else if(document.getElementById('s2').classList.contains('active'))doStep2();
+  }
+})
+</script>
+</body>
+</html>
